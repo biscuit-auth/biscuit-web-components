@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>demo biscuit</title>
+  <link rel="stylesheet" href="/biscuit/index.css">
+  <script type="module" src="/biscuit/index.js"></script>
+</head>
+<body>
+<h1>demo biscuit</h1>
+
+<div class="token">
+  <h2>token</h2>
+  <bc-token-editor biscuit="mon-biscuit">
+    <code>user(#authority, 1234);
+    </code>
+    <code>check if resource(#ambient, "/files/test.txt");
+    </code>
+  </bc-token-editor>
+  <details>
+    <summary>Token content</summary>
+    <bc-token-content>
+    </bc-token-content>
+  </details>
+</div>
+
+<div class="verifier">
+  <h2>verifier</h2>
+  <bc-verifier-editor>
+    <code>// verifier code
+resource(#ambient, "/files/test.txt");
+operation(#ambient, #read);
+test(123, #abc);
+test(456, #def);
+allow if true;
+    </code>
+  </bc-verifier-editor>
+  <bc-verifier-result></bc-verifier-result>
+  <details>
+    <summary>Verifier content</summary>
+    <bc-verifier-content></bc-verifier-content>
+  </details>
+</div>
+
+</body>
+</html>
