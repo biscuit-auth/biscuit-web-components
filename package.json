@@ -1,0 +1,20 @@
+{
+  "name": "biscuit-web-components",
+  "type": "module",
+  "main": "src/bc-verifier-example.js",
+  "author": "Geoffroy Couprie",
+  "scripts": {
+    "start": "wds --node-resolve --open",
+    "serve": "wds --watch",
+    "test": "wtr test/**/*.test.js --node-resolve",
+    "test:watch": "wtr --watch test/**/*.test.js --node-resolve"
+  },
+  "dependencies": {
+    "lit": "^2.0.0",
+    "lit-analyzer": "^1.2.1"
+  },
+  "devDependencies": {
+    "@web/dev-server": "^0.1.25",
+    "@web/test-runner": "^0.13.20"
+  }
+}
