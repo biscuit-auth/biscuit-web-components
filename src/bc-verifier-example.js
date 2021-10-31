@@ -46,8 +46,8 @@ export class BcVerifierExample extends LitElement {
   render () {
     var parseErrors = [];
     var markers = [];
-    var verifier_result = "";
-    var verifier_world = [];
+    var authorizer_result = "";
+    var authorizer_world = [];
 
     var code = this.code;
     if(this.defaultAllow) {
@@ -57,17 +57,17 @@ export class BcVerifierExample extends LitElement {
     if(this.started) {
       var state = {
         token_blocks:[],
-        verifier_code: code,
+        authorizer_code: code,
         query: "",
       };
       var result = execute(state);
 
-      verifier_result = result.verifier_result;
-      verifier_world = result.verifier_world;
+      authorizer_result = result.authorizer_result;
+      authorizer_world = result.authorizer_world;
 
-      if(result.verifier_editor != null) {
+      if(result.authorizer_editor != null) {
 
-        for(let error of result.verifier_editor.errors) {
+        for(let error of result.authorizer_editor.errors) {
           parseErrors.push({
             message: error.message,
             severity: "error",
@@ -76,7 +76,7 @@ export class BcVerifierExample extends LitElement {
           });
         }
 
-        for(let marker of result.verifier_editor.markers) {
+        for(let marker of result.authorizer_editor.markers) {
           var css;
           if(marker.ok) {
             css = "background: #c1f1c1;";
@@ -107,10 +107,10 @@ export class BcVerifierExample extends LitElement {
         @bc-verifier-editor:update="${(e) => { this._onUpdatedCode(e.detail.code) }}"}>
       </bc-verifier-editor>
       <em>Execution result</em>
-      <bc-verifier-result content='${JSON.stringify(verifier_result)}'></bc-verifier-result>
+      <bc-verifier-result content='${JSON.stringify(authorizer_result)}'></bc-verifier-result>
       <details>
         <summary>Facts</summary>
-        <bc-verifier-content content='${JSON.stringify(verifier_world)}'></bc-verifier-content>
+        <bc-verifier-content content='${JSON.stringify(authorizer_world)}'></bc-verifier-content>
     `;
   }
 

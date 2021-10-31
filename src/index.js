@@ -3,12 +3,12 @@ import './bc-token-content.js';
 import './bc-verifier-editor.js';
 import './bc-verifier-result.js';
 import './bc-verifier-content.js';
-import init, {execute} from "@clevercloud/biscuit-component-wasm"
+import init, {execute} from "@geal/biscuit-component-wasm"
 
 
 var state = {
   token_blocks: [],
-  verifier_code: "",
+  authorizer_code: "",
   query: "",
 }
 
@@ -32,7 +32,7 @@ async function setup() {
   document
     .querySelector('bc-verifier-editor')
     .addEventListener('bc-verifier-editor:update', ({ detail: code }) => {
-      state.verifier_code = code.code;
+      state.authorizer_code = code.code;
 
       update();
      });
@@ -102,10 +102,10 @@ function update() {
         .querySelector('bc-token-editor')
         .markers = tokenMarkers;
 
-      if(result.verifier_editor != null) {
+      if(result.authorizer_editor != null) {
         var parseErrors = [];
 
-        for(let error of result.verifier_editor.errors) {
+        for(let error of result.authorizer_editor.errors) {
           parseErrors.push({
             message: error.message,
             severity: "error",
@@ -119,7 +119,7 @@ function update() {
           .parseErrors = parseErrors;
 
         var markers = [];
-        for(let marker of result.verifier_editor.markers) {
+        for(let marker of result.authorizer_editor.markers) {
           var css;
           if(marker.ok) {
             css = "background: #c1f1c1;";
@@ -146,11 +146,11 @@ function update() {
 
       document
         .querySelector('bc-verifier-result')
-         .content = result.verifier_result;
+         .content = result.authorizer_result;
 
       document
         .querySelector('bc-verifier-content')
-         .content = result.verifier_world;
+         .content = result.authorizer_world;
 }
 
 setup();

@@ -14,9 +14,10 @@
 <div class="token">
   <h2>token</h2>
   <bc-token-editor biscuit="mon-biscuit">
-    <code>user(#authority, 1234);
+    <code>user(1234);
     </code>
-    <code>check if resource(#ambient, "/files/test.txt");
+    <code>check if resource("/files/test.txt");
+
     </code>
   </bc-token-editor>
   <details>
@@ -29,11 +30,11 @@
 <div class="verifier">
   <h2>verifier</h2>
   <bc-verifier-editor>
-    <code>// verifier code
-resource(#ambient, "/files/test.txt");
-operation(#ambient, #read);
-test(123, #abc);
-test(456, #def);
+    <code>// authorizer content
+resource("/files/test.txt");
+operation("read");
+test(123, "abc");
+test(456, "def");
 allow if true;
     </code>
   </bc-verifier-editor>
