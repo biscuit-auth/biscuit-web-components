@@ -17,8 +17,8 @@ export class BcVerifierEditor extends LitElement {
 
   constructor () {
     super();
-    if(this.children[0] !=undefined) {
-      this.code = this.children[0].innerText;
+    if(this.children[0] != undefined) {
+      this.code = this.children[0].innerHTML;
     } else {
       this.code = "";
     }

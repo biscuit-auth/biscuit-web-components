@@ -20,7 +20,7 @@ export class BcTokenEditor extends LitElement {
     super();
     this._blocks = [];
     for(const child of Array.from(this.children)) {
-      this._blocks.push({ code: child.innerText });
+      this._blocks.push({ code: child.innerHTML });
     }
 
     this.parseErrors = [];
