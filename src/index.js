@@ -44,7 +44,7 @@ async function setup() {
   const child = document
     .querySelector('bc-verifier-editor').children[0];
   if(child != undefined) {
-    state.verifier_code = child.innerText;
+    state.authorizer_code = child.innerText;
   }
 
   update();
