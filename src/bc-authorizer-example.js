@@ -1,14 +1,14 @@
 import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 import init, {execute} from "@clevercloud/biscuit-component-wasm"
-import './bc-verifier-editor.js';
-import './bc-verifier-result.js';
-import './bc-verifier-content.js';
+import './bc-authorizer-editor.js';
+import './bc-authorizer-result.js';
+import './bc-authorizer-content.js';
 
 /**
  * TODO DOCS
  */
-export class BcVerifierExample extends LitElement {
+export class BcAuthorizerExample extends LitElement {
 
   static get properties () {
     return {
@@ -100,17 +100,17 @@ export class BcVerifierExample extends LitElement {
     }
 
     return html`
-      <bc-verifier-editor
+      <bc-authorizer-editor
         code='${this.code}'
         parseErrors='${JSON.stringify(parseErrors)}'
         markers='${JSON.stringify(markers)}'
-        @bc-verifier-editor:update="${(e) => { this._onUpdatedCode(e.detail.code) }}"}>
-      </bc-verifier-editor>
+        @bc-authorizer-editor:update="${(e) => { this._onUpdatedCode(e.detail.code) }}"}>
+      </bc-authorizer-editor>
       <em>Execution result</em>
-      <bc-verifier-result content='${JSON.stringify(authorizer_result)}'></bc-verifier-result>
+      <bc-authorizer-result content='${JSON.stringify(authorizer_result)}'></bc-authorizer-result>
       <details>
         <summary>Facts</summary>
-        <bc-verifier-content content='${JSON.stringify(authorizer_world)}'></bc-verifier-content>
+        <bc-authorizer-content content='${JSON.stringify(authorizer_world)}'></bc-authorizer-content>
     `;
   }
 
@@ -126,4 +126,4 @@ export class BcVerifierExample extends LitElement {
   }
 }
 
-window.customElements.define('bc-verifier-example', BcVerifierExample);
+window.customElements.define('bc-authorizer-example', BcAuthorizerExample);

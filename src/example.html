@@ -6,18 +6,18 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>demo biscuit</title>
   <link rel="stylesheet" href="/biscuit/index.css">
-  <script type="module" src="/biscuit/bc-verifier-example.js"></script>
+  <script type="module" src="/biscuit/bc-authorizer-example.js"></script>
 </head>
 <body>
 <h1>demo biscuit</h1>
 
-<bc-verifier-example defaultAllow=true>
+<bc-authorizer-example defaultAllow=true>
   <code>resource(#ambient, "/files/test.txt");
 operation(#ambient, #read);
 
 //allow if true;
   </code>
-</bc-verifier-example>
+</bc-authorizer-example>
 
 </body>
 </html>

@@ -5,7 +5,7 @@ import { dispatchCustomEvent } from '../src/lib/events.js';
 /**
  * TODO DOCS
  */
-export class BcVerifierEditor extends LitElement {
+export class BcAuthorizerEditor extends LitElement {
 
   static get properties () {
     return {
@@ -58,4 +58,4 @@ export class BcVerifierEditor extends LitElement {
   }
 }
 
-window.customElements.define('bc-verifier-editor', BcVerifierEditor);
+window.customElements.define('bc-authorizer-editor', BcAuthorizerEditor);

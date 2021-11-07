@@ -3,7 +3,7 @@ import { css, html, LitElement } from 'lit-element';
 /**
  * TODO DOCS
  */
-export class BcVerifierContent extends LitElement {
+export class BcAuthorizerContent extends LitElement {
 
   static get properties () {
     return {
@@ -80,4 +80,4 @@ td, th {
   }
 }
 
-window.customElements.define('bc-verifier-content', BcVerifierContent);
+window.customElements.define('bc-authorizer-content', BcAuthorizerContent);
