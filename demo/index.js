@@ -1,8 +1,8 @@
-import './bc-token-editor.js';
-import './bc-token-content.js';
-import './bc-verifier-editor.js';
-import './bc-verifier-result.js';
-import './bc-verifier-content.js';
+import '/src/bc-token-editor.js';
+import '/src/bc-token-content.js';
+import '/src/bc-authorizer-editor.js';
+import '/src/bc-authorizer-result.js';
+import '/src/bc-authorizer-content.js';
 import init, {execute} from "@geal/biscuit-component-wasm"
 
 

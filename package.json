@@ -4,8 +4,8 @@
   "main": "src/bc-verifier-example.js",
   "author": "Geoffroy Couprie",
   "scripts": {
-    "start": "wds --node-resolve --open",
-    "serve": "wds --node-resolve --watch",
+    "start": "wds --node-resolve --open demo/ --open",
+    "serve": "wds --node-resolve --open demo/ --watch",
     "test": "wtr test/**/*.test.js --node-resolve",
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve"
   },
@@ -16,6 +16,7 @@
     "lit-analyzer": "^1.2.1"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.0.6",
     "@web/dev-server": "^0.1.25",
     "@web/test-runner": "^0.13.20"
   }
