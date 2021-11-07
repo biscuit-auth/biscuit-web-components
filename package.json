@@ -1,9 +1,8 @@
 {
-  "name": "biscuit-web-components",
+  "name": "@geal/biscuit-web-components",
   "type": "module",
-  "main": "src/bc-verifier-example.js",
-  "author": "Geoffroy Couprie",
   "main": "src/index.js",
+  "author": "Geoffroy Couprie",
   "module": "src/index.js",
   "version": "0.1.0",
   "scripts": {
@@ -22,5 +21,15 @@
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@web/dev-server": "^0.1.25",
     "@web/test-runner": "^0.13.20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/biscuit-auth/biscuit-web-components.git"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/biscuit-auth/biscuit-web-components/issues"
+  },
+  "homepage": "https://github.com/biscuit-auth/biscuit-web-components#readme",
+  "description": ""
 }
