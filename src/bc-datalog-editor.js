@@ -7,7 +7,7 @@ import 'codemirror/addon/mode/simple.js';
 import 'codemirror/addon/lint/lint.js';
 
 // déso
-const { CodeMirror } = globalThis;
+//const { CodeMirror } = globalThis;
 
 function defineSimpleMode () {
   CodeMirror.defineSimpleMode('biscuit', {

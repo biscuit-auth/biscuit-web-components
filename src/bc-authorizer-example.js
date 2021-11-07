@@ -1,6 +1,6 @@
 import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
-import init, {execute} from "@clevercloud/biscuit-component-wasm"
+import init, {execute} from "@geal/biscuit-component-wasm"
 import './bc-authorizer-editor.js';
 import './bc-authorizer-result.js';
 import './bc-authorizer-content.js';
@@ -14,14 +14,14 @@ export class BcAuthorizerExample extends LitElement {
     return {
       code: { type: String },
       defaultAllow: { type: Boolean },
-      started: { tyope: Boolean },
+      started: { type: Boolean },
     };
   }
 
   constructor () {
     super();
     if(this.children[0] != undefined) {
-      this.code = this.children[0].innerText;
+      this.code = this.children[0].innerHTML;
     } else {
       this.code = "";
     }
