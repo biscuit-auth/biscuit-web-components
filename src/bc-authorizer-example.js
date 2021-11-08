@@ -1,4 +1,5 @@
-import { css, html, LitElement } from 'lit-element';
+import { css, html, LitElement } from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 import init, {execute} from "@geal/biscuit-component-wasm"
 import './bc-authorizer-editor.js';

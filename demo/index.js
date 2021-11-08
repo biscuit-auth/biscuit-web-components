@@ -30,8 +30,8 @@ async function setup() {
      });
 
   document
-    .querySelector('bc-verifier-editor')
-    .addEventListener('bc-verifier-editor:update', ({ detail: code }) => {
+    .querySelector('bc-authorizer-editor')
+    .addEventListener('bc-authorizer-editor:update', ({ detail: code }) => {
       state.authorizer_code = code.code;
 
       update();
@@ -42,7 +42,7 @@ async function setup() {
   }
 
   const child = document
-    .querySelector('bc-verifier-editor').children[0];
+    .querySelector('bc-authorizer-editor').children[0];
   if(child != undefined) {
     state.authorizer_code = child.innerText;
   }
@@ -115,7 +115,7 @@ function update() {
         }
 
         document
-          .querySelector('bc-verifier-editor')
+          .querySelector('bc-authorizer-editor')
           .parseErrors = parseErrors;
 
         var markers = [];
@@ -140,16 +140,16 @@ function update() {
           });
         }
         document
-          .querySelector('bc-verifier-editor')
+          .querySelector('bc-authorizer-editor')
           .markers = markers;
       }
 
       document
-        .querySelector('bc-verifier-result')
+        .querySelector('bc-authorizer-result')
          .content = result.authorizer_result;
 
       document
-        .querySelector('bc-verifier-content')
+        .querySelector('bc-authorizer-content')
          .content = result.authorizer_world;
 }
 
