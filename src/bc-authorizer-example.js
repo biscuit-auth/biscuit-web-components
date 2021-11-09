@@ -1,10 +1,11 @@
 import { css, html, LitElement } from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
-import init, {execute} from "@geal/biscuit-component-wasm"
+import {execute} from "@geal/biscuit-component-wasm"
 import './bc-authorizer-editor.js';
 import './bc-authorizer-result.js';
 import './bc-authorizer-content.js';
+import './wasm.js'
 
 /**
  * TODO DOCS
@@ -37,7 +38,7 @@ export class BcAuthorizerExample extends LitElement {
   }
 
   firstUpdated(changedProperties) {
-    init().then(() => this.started = true);
+    initialize().then(() => this.started = true);
   }
 
   update (changedProperties) {
