@@ -5,7 +5,7 @@ import {execute} from "@geal/biscuit-component-wasm"
 import './bc-authorizer-editor.js';
 import './bc-authorizer-result.js';
 import './bc-authorizer-content.js';
-import './wasm.js'
+import {initialize} from './wasm.js'
 
 /**
  * TODO DOCS
