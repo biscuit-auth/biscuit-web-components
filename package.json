@@ -12,15 +12,15 @@
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve"
   },
   "dependencies": {
-    "@geal/biscuit-component-wasm": "^0.1.0",
+    "@geal/biscuit-component-wasm": "^0.1.1",
     "codemirror": "^5.59.2",
     "lit": "^2.0.0",
     "lit-analyzer": "^1.2.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.6",
-    "@web/dev-server": "^0.1.25",
-    "@web/test-runner": "^0.13.20"
+    "@web/dev-server": "^0.1.28",
+    "@web/test-runner": "^0.13.21"
   },
   "repository": {
     "type": "git",
