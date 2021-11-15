@@ -7,9 +7,10 @@ export const codemirrorStyles = css`
   .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     font-family: monospace;
-    height: 300px;
+    /*height: 300px;*/
     color: black;
     direction: ltr;
+    text-align: left;
   }
 
   /* PADDING */
