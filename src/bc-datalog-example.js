@@ -10,12 +10,11 @@ import {initialize} from './wasm.js'
 /**
  * TODO DOCS
  */
-export class BcAuthorizerExample extends LitElement {
+export class BcDatalogExample extends LitElement {
 
   static get properties () {
     return {
       code: { type: String },
-      defaultAllow: { type: Boolean },
       started: { type: Boolean },
     };
   }
@@ -28,7 +27,9 @@ export class BcAuthorizerExample extends LitElement {
       this.code = "";
     }
 
-    this.defaultAllow = false;
+    console.log("constructor: got code:");
+    console.log(this.code);
+
     this.started = false;
   }
 
@@ -52,9 +53,7 @@ export class BcAuthorizerExample extends LitElement {
     var authorizer_world = [];
 
     var code = this.code;
-    if(this.defaultAllow) {
-      code += "\n\nallow if true;";
-    }
+    code += "\n\nallow if true;";
 
     if(this.started) {
       var state = {
@@ -108,12 +107,8 @@ export class BcAuthorizerExample extends LitElement {
         markers='${JSON.stringify(markers)}'
         @bc-authorizer-editor:update="${(e) => { this._onUpdatedCode(e.detail.code) }}"}>
       </bc-authorizer-editor>
-      <em>Execution result</em>
-      <bc-authorizer-result content='${JSON.stringify(authorizer_result)}'></bc-authorizer-result>
-      <details>
-        <summary>Facts</summary>
-        <bc-authorizer-content content='${JSON.stringify(authorizer_world)}'></bc-authorizer-content>
-      </details>
+      Facts:
+      <bc-authorizer-content content='${JSON.stringify(authorizer_world)}'></bc-authorizer-content>
     `;
   }
 
@@ -129,4 +124,4 @@ export class BcAuthorizerExample extends LitElement {
   }
 }
 
-window.customElements.define('bc-authorizer-example', BcAuthorizerExample);
+window.customElements.define('bc-datalog-example', BcDatalogExample);
