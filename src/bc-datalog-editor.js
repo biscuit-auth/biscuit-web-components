@@ -2,12 +2,8 @@ import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 import { codemirrorStyles } from './codemirror.css.js';
 import { codemirrorLinkStyles } from './lint.css.js';
-import 'codemirror/lib/codemirror.js';
 import 'codemirror/addon/mode/simple.js';
 import 'codemirror/addon/lint/lint.js';
-
-// déso
-//const { CodeMirror } = globalThis;
 
 function defineSimpleMode () {
   CodeMirror.defineSimpleMode('biscuit', {
