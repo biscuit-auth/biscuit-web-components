@@ -12,8 +12,13 @@
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve"
   },
   "dependencies": {
-    "@geal/biscuit-component-wasm": "^0.1.1",
-    "codemirror": "^5.64.0",
+    "@codemirror/basic-setup": "^0.19.0",
+    "@codemirror/gutter": "^0.19.5",
+    "@codemirror/highlight": "^0.19.6",
+    "@codemirror/legacy-modes": "^0.19.0",
+    "@codemirror/stream-parser": "^0.19.2",
+    "@codemirror/theme-one-dark": "^0.19.1",
+    "@geal/biscuit-component-wasm": "file:../biscuit-component-wasm/web",
     "lit": "^2.0.0",
     "lit-analyzer": "^1.2.1"
   },

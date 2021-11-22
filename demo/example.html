@@ -12,8 +12,11 @@
 <h1>demo biscuit</h1>
 
 <bc-authorizer-example>
-  <code>resource("/files/test.txt");
+  <code>// comment
+resource("/files/test.txt");
 operation("read");
+
+rule($data) <- fact(1, $fact);
 
 allow if true;
   </code>
