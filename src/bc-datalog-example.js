@@ -72,8 +72,8 @@ export class BcDatalogExample extends LitElement {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            from: CodeMirror.Pos(error.position.line_start, error.position.column_start),
-            to: CodeMirror.Pos(error.position.line_end, error.position.column_end),
+            from: error.position.start,//CodeMirror.Pos(error.position.line_start, error.position.column_start),
+            to: error.position.end,//CodeMirror.Pos(error.position.line_end, error.position.column_end),
           });
         }
 

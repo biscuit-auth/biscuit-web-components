@@ -2,14 +2,15 @@ import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 
 import {keymap, EditorView} from "@codemirror/view"
-import {EditorState} from "@codemirror/state"
+import {EditorState,StateField,StateEffect} from "@codemirror/state"
 import {basicSetup} from "@codemirror/basic-setup"
 import {history, historyKeymap} from "@codemirror/history"
 import {defaultKeymap} from "@codemirror/commands"
 import {StreamLanguage} from "@codemirror/stream-parser"
 import {simpleMode} from "@codemirror/legacy-modes/mode/simple-mode"
-import {lineNumbers} from "@codemirror/gutter"
+import {lineNumbers, GutterMarker, gutter} from "@codemirror/gutter"
 import {classHighlightStyle} from "@codemirror/highlight";
+import {RangeSet} from "@codemirror/rangeset";
 
 let biscuit_mode = simpleMode({
   // The start state contains the rules that are initially used
@@ -77,6 +78,48 @@ let biscuit_mode = simpleMode({
 
 //defineSimpleMode();
 
+function resetParseError(view) {
+  view.dispatch({
+    effects: resetParseErrorEffect.of({})
+  })
+}
+
+function setParseError(view, pos) {
+  let parseErrors = view.state.field(parseErrorState)
+  view.dispatch({
+    effects: parseErrorEffect.of({pos})
+  })
+}
+
+const resetParseErrorEffect = StateEffect.define({
+  map: (val, mapping) => ({})
+})
+const parseErrorEffect = StateEffect.define({
+  map: (val, mapping) => ({pos: mapping.mapPos(val.pos), on: true})
+})
+
+const parseErrorState = StateField.define({
+  create() { return RangeSet.empty },
+  update(set, transaction) {
+    set = set.map(transaction.changes)
+    for (let e of transaction.effects) {
+      if (e.is(parseErrorEffect)) {
+        set = set.update({add: [parseErrorMarker.range(e.value.pos)]})
+      }
+      if (e.is(resetParseErrorEffect)) {
+        set = RangeSet.empty
+      }
+    }
+    return set
+  }
+})
+
+const parseErrorMarker = new class extends GutterMarker {
+  toDOM() {
+    return document.createTextNode("❌")
+  }
+}
+
 /**
  * TODO DOCS
  */
@@ -114,6 +157,22 @@ export class BcDatalogEditor extends LitElement {
       }
     });
 
+    const parseErrorGutter = [
+      parseErrorState,
+      gutter({
+        class: "cm-parse-error-gutter",
+        markers: v => v.state.field(parseErrorState),
+        initialSpacer: () => parseErrorMarker,
+      }),
+      EditorView.baseTheme({
+        ".cm-parse-error-gutter .cm-gutterElement": {
+          color: "red",
+          paddingLeft: "5px",
+          cursor: "default"
+        }
+      })
+    ]
+
     this._cm = new EditorView({
       root: this.renderRoot,
       state: EditorState.create({
@@ -125,9 +184,11 @@ export class BcDatalogEditor extends LitElement {
           keymap.of([...defaultKeymap, ...historyKeymap]),
           updateListenerExtension,
           StreamLanguage.define(biscuit_mode),
+          parseErrorGutter,
         ]
       }),
     });
+
     textarea.parentNode.insertBefore(this._cm.dom, textarea)
     textarea.style.display = "none"
     if (textarea.form) textarea.form.addEventListener("submit", () => {
@@ -160,6 +221,14 @@ export class BcDatalogEditor extends LitElement {
         this._cm.dispatch({
           changes: {from: 0, to: this._cm.state.doc.length, insert: this.datalog}
         })
+      }
+    }
+
+    if(changedProperties.has('parseErrors')) {
+      resetParseError(this._cm);
+
+      for (let error of this.parseErrors) {
+        setParseError(this._cm, error.from);
       }
     }
 

@@ -73,8 +73,9 @@ export class BcAuthorizerExample extends LitElement {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            from: CodeMirror.Pos(error.position.line_start, error.position.column_start),
-            to: CodeMirror.Pos(error.position.line_end, error.position.column_end),
+            line_start: error.position.line_start,
+            from: error.position.start,//CodeMirror.Pos(error.position.line_start, error.position.column_start),
+            to: error.position.end,//CodeMirror.Pos(error.position.line_end, error.position.column_end),
           });
         }
 
