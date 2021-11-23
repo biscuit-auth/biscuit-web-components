@@ -1,12 +1,7 @@
 import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
-import { codemirrorStyles } from './codemirror.css.js';
 
-//import { codemirrorLinkStyles } from './lint.css.js';
-//import 'codemirror/addon/mode/simple.js';
-//import 'codemirror/addon/lint/lint.js';
 import {keymap, EditorView} from "@codemirror/view"
-//import {darkTheme} from "@codemirror/view/theme"
 import {EditorState} from "@codemirror/state"
 import {basicSetup} from "@codemirror/basic-setup"
 import {history, historyKeymap} from "@codemirror/history"
@@ -14,8 +9,8 @@ import {defaultKeymap} from "@codemirror/commands"
 import {StreamLanguage} from "@codemirror/stream-parser"
 import {simpleMode} from "@codemirror/legacy-modes/mode/simple-mode"
 import {lineNumbers} from "@codemirror/gutter"
-import { oneDarkTheme } from "@codemirror/theme-one-dark";
 import {classHighlightStyle} from "@codemirror/highlight";
+
 let biscuit_mode = simpleMode({
   // The start state contains the rules that are initially used
   start: [
@@ -120,6 +115,7 @@ export class BcDatalogEditor extends LitElement {
     });
 
     this._cm = new EditorView({
+      root: this.renderRoot,
       state: EditorState.create({
         doc: textarea.value,
         extensions: [
@@ -129,7 +125,6 @@ export class BcDatalogEditor extends LitElement {
           keymap.of([...defaultKeymap, ...historyKeymap]),
           updateListenerExtension,
           StreamLanguage.define(biscuit_mode),
-          classHighlightStyle,
         ]
       }),
     });
@@ -203,23 +198,17 @@ export class BcDatalogEditor extends LitElement {
     return html`
     <div>
       <textarea></textarea>
-      <p class="csstest">Hello</p>
     </div>
     `;
   }
 
-  //static styles =  codemirrorStyles;
   static get styles () {
     return [
-      codemirrorStyles,
-      //codemirrorLinkStyles,
       // language=CSS
       css`
         :host {
           display: block;
         }
-
-        .csstest { background: red }
       `,
     ];
   }

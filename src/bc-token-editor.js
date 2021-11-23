@@ -61,7 +61,7 @@ export class BcTokenEditor extends LitElement {
     `;
   }
 
-  /*static get styles () {
+  static get styles () {
     return [
       // language=CSS
       css`
