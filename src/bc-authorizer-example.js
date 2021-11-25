@@ -96,7 +96,10 @@ export class BcAuthorizerExample extends LitElement {
               line: marker.position.line_end,
               ch: marker.position.column_end,
             },
+            start: marker.position.start,
+            end: marker.position.end,
             options: { css: css},
+            ok: marker.ok,
           });
         }
       }

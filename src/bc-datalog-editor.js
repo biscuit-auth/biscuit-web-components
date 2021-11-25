@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit-element';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 
-import {keymap, EditorView} from "@codemirror/view"
+import {keymap, EditorView, Range, Decoration} from "@codemirror/view"
 import {EditorState,StateField,StateEffect} from "@codemirror/state"
 import {basicSetup} from "@codemirror/basic-setup"
 import {history, historyKeymap} from "@codemirror/history"
@@ -75,9 +75,6 @@ let biscuit_mode = simpleMode({
 
 });
 
-
-//defineSimpleMode();
-
 function resetParseError(view) {
   view.dispatch({
     effects: resetParseErrorEffect.of({})
@@ -119,6 +116,61 @@ const parseErrorMarker = new class extends GutterMarker {
     return document.createTextNode("❌")
   }
 }
+
+// Effects can be attached to transactions to communicate with the extension
+const addSuccessMarks = StateEffect.define(), addFailureMarks = StateEffect.define(),
+  resetMarks = StateEffect.define()
+
+// This value must be added to the set of extensions to enable this
+const markField = StateField.define({
+  // Start with an empty set of decorations
+  create() { return Decoration.none },
+  // This is called whenever the editor updates—it computes the new set
+  update(value, tr) {
+    // Move the decorations to account for document changes
+    value = value.map(tr.changes)
+    // If this transaction adds or removes decorations, apply those changes
+    for (let effect of tr.effects) {
+      if (effect.is(addSuccessMarks)) value = value.update({add: effect.value, sort: true})
+      else if (effect.is(addFailureMarks)) value = value.update({add: effect.value, sort: true})
+      else if (effect.is(resetMarks)) value = value.update({filter: (from, to) => false})
+    }
+    return value
+  },
+  // Indicate that this field provides a set of decorations
+  provide: f => EditorView.decorations.from(f)
+})
+
+const successMark = Decoration.mark({
+  attributes: {style: "background: rgb(193, 241, 193)"}
+})
+
+const failureMark = Decoration.mark({
+  attributes: {style: "background: rgb(255, 162, 162)"}
+})
+
+function resetAllMarks(view) {
+  view.dispatch({
+    effects: resetMarks.of({})
+  })
+}
+
+function setSuccessMark(view, start, end) {
+  let parseErrors = view.state.field(parseErrorState)
+  console.log("start:"+start);
+  console.log("end:"+end);
+  view.dispatch({
+    effects: addSuccessMarks.of([successMark.range(start, end)])
+  })
+}
+
+function setFailureMark(view, start, end) {
+  let parseErrors = view.state.field(parseErrorState)
+  view.dispatch({
+    effects: addFailureMarks.of([failureMark.range(start, end)])
+  })
+}
+
 
 /**
  * TODO DOCS
@@ -185,6 +237,7 @@ export class BcDatalogEditor extends LitElement {
           updateListenerExtension,
           StreamLanguage.define(biscuit_mode),
           parseErrorGutter,
+          markField,
         ]
       }),
     });
@@ -229,6 +282,20 @@ export class BcDatalogEditor extends LitElement {
 
       for (let error of this.parseErrors) {
         setParseError(this._cm, error.from);
+      }
+    }
+
+    if(changedProperties.has('markers')) {
+      resetAllMarks(this._cm);
+
+      for(let mark of this.markers) {
+        console.log("got mark");
+        console.log(mark);
+        if(mark.ok) {
+          setSuccessMark(this._cm, mark.start, mark.end);
+        } else {
+          setFailureMark(this._cm, mark.start, mark.end);
+        }
       }
     }
 
