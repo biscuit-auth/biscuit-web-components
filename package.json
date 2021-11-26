@@ -19,7 +19,7 @@
     "@codemirror/rangeset": "^0.19.2",
     "@codemirror/stream-parser": "^0.19.2",
     "@codemirror/theme-one-dark": "^0.19.1",
-    "@geal/biscuit-component-wasm": "file:../biscuit-component-wasm/web",
+    "@geal/biscuit-component-wasm": "^0.1.2",
     "lit": "^2.0.0",
     "lit-analyzer": "^1.2.1"
   },
