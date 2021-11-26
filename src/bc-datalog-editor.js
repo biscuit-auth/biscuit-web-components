@@ -197,6 +197,8 @@ export class BcDatalogEditor extends LitElement {
 
   firstUpdated () {
     const textarea = this.shadowRoot.querySelector('textarea');
+    this.parseErrors = [];
+    this.markers = [];
     this._displayedMarks = [];
 
     let updateListenerExtension = EditorView.updateListener.of((update) => {

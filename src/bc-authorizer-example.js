@@ -80,13 +80,7 @@ export class BcAuthorizerExample extends LitElement {
         }
 
         for(let marker of result.authorizer_editor.markers) {
-          var css;
-          if(marker.ok) {
-            css = "background: #c1f1c1;";
-          } else {
-            css = "background: #ffa2a2;";
-          }
-
+          console.log(marker);
           markers.push({
             from: {
               line: marker.position.line_start,
@@ -98,7 +92,6 @@ export class BcAuthorizerExample extends LitElement {
             },
             start: marker.position.start,
             end: marker.position.end,
-            options: { css: css},
             ok: marker.ok,
           });
         }

@@ -66,8 +66,8 @@ function update() {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            from: CodeMirror.Pos(error.position.line_start, error.position.column_start),
-            to: CodeMirror.Pos(error.position.line_end, error.position.column_end),
+            from: error.position.start,//CodeMirror.Pos(error.position.line_start, error.position.column_start),
+            to: error.position.end,//CodeMirror.Pos(error.position.line_end, error.position.column_end),
           });
         }
         tokenErrors.push(parseErrors);
@@ -91,6 +91,9 @@ function update() {
               ch: marker.position.column_end,
             },
             options: { css: css},
+            start: marker.position.start,
+            end: marker.position.end,
+            ok: marker.ok,
           });
         }
         tokenMarkers.push(markers);

@@ -78,13 +78,6 @@ export class BcDatalogExample extends LitElement {
         }
 
         for(let marker of result.authorizer_editor.markers) {
-          var css;
-          if(marker.ok) {
-            css = "background: #c1f1c1;";
-          } else {
-            css = "background: #ffa2a2;";
-          }
-
           markers.push({
             from: {
               line: marker.position.line_start,
@@ -94,7 +87,9 @@ export class BcDatalogExample extends LitElement {
               line: marker.position.line_end,
               ch: marker.position.column_end,
             },
-            options: { css: css},
+            start: marker.position.start,
+            end: marker.position.end,
+            ok: marker.ok,
           });
         }
       }
