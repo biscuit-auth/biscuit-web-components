@@ -264,23 +264,33 @@ export class BcDatalogEditor extends LitElement {
     }
 
     if(changedProperties.has('parseErrors')) {
+      console.log("got parseErrors");
       resetParseError(this._cm);
 
-      for (let error of this.parseErrors) {
-        setParseError(this._cm, error.from);
+      console.log(this.parseErrors);
+      console.log(changedProperties.get('parseErrors'));
+      let errs = changedProperties.get('parseErrors');
+      if(errs != undefined) {
+        for (let error of errs) {
+          setParseError(this._cm, error.from);
+        }
       }
     }
 
     if(changedProperties.has('markers')) {
       resetAllMarks(this._cm);
 
-      for(let mark of this.markers) {
-        console.log("got mark");
-        console.log(mark);
-        if(mark.ok) {
-          setSuccessMark(this._cm, mark.start, mark.end);
-        } else {
-          setFailureMark(this._cm, mark.start, mark.end);
+
+      let marks = changedProperties.get('markers');
+      if(marks != undefined) {
+        for(let mark of changedProperties.get('markers')) {
+          console.log("got mark");
+          console.log(mark);
+          if(mark.ok) {
+            setSuccessMark(this._cm, mark.start, mark.end);
+          } else {
+            setFailureMark(this._cm, mark.start, mark.end);
+          }
         }
       }
     }
