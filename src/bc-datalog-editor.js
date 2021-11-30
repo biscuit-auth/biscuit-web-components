@@ -249,22 +249,6 @@ export class BcDatalogEditor extends LitElement {
     if (textarea.form) textarea.form.addEventListener("submit", () => {
       textarea.value = view.state.doc.toString()
     })
-    /*
-    new CodeMirror.fromTextArea(textarea, {
-      mode: 'biscuit',
-      autoCloseTags: true,
-      lineNumbers: true,
-      gutters: ['CodeMirror-lint-markers'],
-      lintOnChange: false,
-      lint: {
-         getAnnotations: () => {
-           this.parseErrors
-         },
-      },
-    });
-    */
-
-    //this._cm.on('change', () => this._onText(this._cm.getValue()));
   }
 
   updated (changedProperties) {
@@ -300,36 +284,6 @@ export class BcDatalogEditor extends LitElement {
         }
       }
     }
-
-    /*
-    if(changedProperties.has('parseErrors')) {
-      var state = this._cm.state.lint;
-      if(state.hasGutter) this._cm.clearGutter("CodeMirror-lint-markers"); 
-      for (var i = 0; i < state.marked.length; ++i) {
-        state.marked[i].clear();
-      }
-      state.marked.length = 0;
-
-      this._cm.setOption("lint", false);
-      this._cm.setOption("lint", {
-         getAnnotations: () => {
-           return this.parseErrors;
-         },
-      });
-    }
-
-    if(changedProperties.has('markers')) {
-      for(let mark of this._displayedMarks) {
-        mark.clear();
-      }
-      this._displayedMarks = [];
-
-      for(let marker of this.markers) {
-        var mark = this._cm.markText(marker.from, marker.to, marker.options);
-        this._displayedMarks.push(mark);
-      }
-
-    }*/
   }
 
   render () {
