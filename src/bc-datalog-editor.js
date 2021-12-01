@@ -157,8 +157,6 @@ function resetAllMarks(view) {
 
 function setSuccessMark(view, start, end) {
   let parseErrors = view.state.field(parseErrorState)
-  console.log("start:"+start);
-  console.log("end:"+end);
   view.dispatch({
     effects: addSuccessMarks.of([successMark.range(start, end)])
   })
@@ -203,10 +201,6 @@ export class BcDatalogEditor extends LitElement {
 
     let updateListenerExtension = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
-        console.log("updated");
-        console.log(update);
-        console.log("content");
-        console.log(htmlEntities(this._cm.state.doc.toString()));
         this._onText(htmlEntities(this._cm.state.doc.toString()));
       }
     });
@@ -284,8 +278,6 @@ export class BcDatalogEditor extends LitElement {
       let marks = changedProperties.get('markers');
       if(marks != undefined) {
         for(let mark of changedProperties.get('markers')) {
-          console.log("got mark");
-          console.log(mark);
           if(mark.ok) {
             setSuccessMark(this._cm, mark.start, mark.end);
           } else {
