@@ -190,14 +190,14 @@ export class BcDatalogEditor extends LitElement {
   }
 
   _onText (code) {
+    this.datalog = code;
     dispatchCustomEvent(this, 'update', {code: code});
   }
 
   firstUpdated () {
     const textarea = this.shadowRoot.querySelector('textarea');
-    this.parseErrors = [];
-    this.markers = [];
-    this._displayedMarks = [];
+    //this.parseErrors = [];
+    //this.markers = [];
 
     let updateListenerExtension = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
@@ -262,10 +262,9 @@ export class BcDatalogEditor extends LitElement {
       resetParseError(this._cm);
 
       console.log(this.parseErrors);
-      console.log(changedProperties.get('parseErrors'));
       let errs = changedProperties.get('parseErrors');
-      if(errs != undefined) {
-        for (let error of errs) {
+      if(changedProperties.has('parseErrors')) {
+        for (let error of this.parseErrors) {
           setParseError(this._cm, error.from);
         }
       }
@@ -275,9 +274,8 @@ export class BcDatalogEditor extends LitElement {
       resetAllMarks(this._cm);
 
 
-      let marks = changedProperties.get('markers');
-      if(marks != undefined) {
-        for(let mark of changedProperties.get('markers')) {
+      if(changedProperties.has('markers')) {
+        for(let mark of this.markers) {
           if(mark.ok) {
             setSuccessMark(this._cm, mark.start, mark.end);
           } else {
