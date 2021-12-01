@@ -14,22 +14,20 @@ export class BcFullExample extends LitElement {
 
   static get properties () {
     return {
-      biscuit: { type: String },
-      _blocks: { type: Array },
+      blocks: { type: Array },
       _authorizer: { type: String },
 
-      code: { type: String },
       _started: { type: Boolean },
     };
   }
 
   constructor () {
     super();
-    this._blocks = [];
+    this.blocks = [];
 
     for(let block of this.querySelectorAll(".block")) {
       console.log("block: "+block.innerHTML);
-      this._blocks.push({ code: block.innerHTML });
+      this.blocks.push({ code: block.innerHTML });
     }
 
     let auth = this.querySelector(".authorizer");
@@ -39,17 +37,21 @@ export class BcFullExample extends LitElement {
     console.log("authorizer: "+this._authorizer);
 
     this._started = false;
-    this.biscuit = "";
   }
 
-  _onUpdatedBlock(block, code) {
-    block.code = code;
-    dispatchCustomEvent(this, 'update', {blocks: this._blocks});
+  _onUpdatedBlock(index, code) {
+    console.log("full::_onUpdatedCode");
+    console.log(code);
+    this.blocks[index].code = code;
+    console.log(this.blocks);
+    dispatchCustomEvent(this, 'update', {blocks: this.blocks});
+    this.requestUpdate();
   }
 
   _onUpdatedAuthorizer(code) {
     this._authorizer = code;
     dispatchCustomEvent(this, 'update', {_authorizer: code});
+    this.requestUpdate();
   }
 
   firstUpdated(changedProperties) {
@@ -69,18 +71,9 @@ export class BcFullExample extends LitElement {
      return html``;
    }
 
-    console.log(this.biscuit);
-    if(this.biscuit !== "") {
-      var result = parse_token({data: this.biscuit});
-      console.log(result);
-      for(let block of result.token_blocks) {
-        this._block.push({code: block});
-      }
-    }
-
-
+    console.log(this.blocks);
     let blocks = [];
-    for(let b of this._blocks) {
+    for(let b of this.blocks) {
       blocks.push(b.code);
     }
     var state = {
@@ -161,12 +154,12 @@ export class BcFullExample extends LitElement {
     }
 
     return html`
-      ${this._blocks.map((block, index) => html`
+      ${this.blocks.map((block, index) => html`
         <bc-datalog-editor
           datalog=${block.code}
           parseErrors='${JSON.stringify(blockParseErrors[index])}'
           markers='${JSON.stringify(blockMarkers[index])}'
-          @bc-datalog-editor:update="${(e) => { this._onUpdatedBlock(block, e.detail.code) }}"}>
+          @bc-datalog-editor:update="${(e) => { this._onUpdatedBlock(index, e.detail.code) }}"}>
         </bc-datalog-editor>
       `)}
 
