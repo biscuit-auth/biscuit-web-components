@@ -13,25 +13,20 @@
 <h1>demo biscuit</h1>
 
 <bc-full-example>
-    <code class="block">user(1234);
+    <code class="block">user($1234);
     </code>
-    <code class = "block">check if resource("/files/test.txt");
+    <code class = "block">check if resource("/files/test.tx");
 
     </code>
 
     <code class="authorizer">// authorizer content
-resource("/files/test.txt");
+resource("/files/test.tx");
 operation("read");
 test(123, "abc");
 test(456, "def");
 allow if true;
     </code>
 
-  <bc-authorizer-result></bc-authorizer-result>
-  <details>
-    <summary>Verifier content</summary>
-    <bc-authorizer-content></bc-authorizer-content>
-  </details>
 </bc-full-example>
 <hr />
 
