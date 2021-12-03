@@ -237,6 +237,7 @@ export class BcDatalogEditor extends LitElement {
       css`
         :host {
           display: block;
+          background: white;
         }
       `,
     ];
