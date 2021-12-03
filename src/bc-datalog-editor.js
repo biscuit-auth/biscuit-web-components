@@ -75,51 +75,9 @@ let biscuit_mode = simpleMode({
 
 });
 
-function resetParseError(view) {
-  view.dispatch({
-    effects: resetParseErrorEffect.of({})
-  })
-}
-
-function setParseError(view, pos) {
-  let parseErrors = view.state.field(parseErrorState)
-  view.dispatch({
-    effects: parseErrorEffect.of({pos})
-  })
-}
-
-const resetParseErrorEffect = StateEffect.define({
-  map: (val, mapping) => ({})
-})
-const parseErrorEffect = StateEffect.define({
-  map: (val, mapping) => ({pos: mapping.mapPos(val.pos), on: true})
-})
-
-const parseErrorState = StateField.define({
-  create() { return RangeSet.empty },
-  update(set, transaction) {
-    set = set.map(transaction.changes)
-    for (let e of transaction.effects) {
-      if (e.is(parseErrorEffect)) {
-        set = set.update({add: [parseErrorMarker.range(e.value.pos)]})
-      }
-      if (e.is(resetParseErrorEffect)) {
-        set = RangeSet.empty
-      }
-    }
-    return set
-  }
-})
-
-const parseErrorMarker = new class extends GutterMarker {
-  toDOM() {
-    return document.createTextNode("❌")
-  }
-}
-
 // Effects can be attached to transactions to communicate with the extension
 const addSuccessMarks = StateEffect.define(), addFailureMarks = StateEffect.define(),
-  resetMarks = StateEffect.define()
+  addParseErrorMarks = StateEffect.define(), resetMarks = StateEffect.define()
 
 // This value must be added to the set of extensions to enable this
 const markField = StateField.define({
@@ -133,6 +91,7 @@ const markField = StateField.define({
     for (let effect of tr.effects) {
       if (effect.is(addSuccessMarks)) value = value.update({add: effect.value, sort: true})
       else if (effect.is(addFailureMarks)) value = value.update({add: effect.value, sort: true})
+      else if (effect.is(addParseErrorMarks)) value = value.update({add: effect.value, sort: true})
       else if (effect.is(resetMarks)) value = value.update({filter: (from, to) => false})
     }
     return value
@@ -149,6 +108,10 @@ const failureMark = Decoration.mark({
   attributes: {style: "background: rgb(255, 162, 162)"}
 })
 
+const parseErrorMark = Decoration.mark({
+  attributes: {style: "text-decoration: underline red wavy"}
+})
+
 function resetAllMarks(view) {
   view.dispatch({
     effects: resetMarks.of({})
@@ -156,16 +119,20 @@ function resetAllMarks(view) {
 }
 
 function setSuccessMark(view, start, end) {
-  let parseErrors = view.state.field(parseErrorState)
   view.dispatch({
     effects: addSuccessMarks.of([successMark.range(start, end)])
   })
 }
 
 function setFailureMark(view, start, end) {
-  let parseErrors = view.state.field(parseErrorState)
   view.dispatch({
     effects: addFailureMarks.of([failureMark.range(start, end)])
+  })
+}
+
+function setParseErrorMark(view, start, end) {
+  view.dispatch({
+    effects: addParseErrorMarks.of([parseErrorMark.range(start, end)])
   })
 }
 
@@ -196,30 +163,12 @@ export class BcDatalogEditor extends LitElement {
 
   firstUpdated () {
     const textarea = this.shadowRoot.querySelector('textarea');
-    //this.parseErrors = [];
-    //this.markers = [];
 
     let updateListenerExtension = EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         this._onText(htmlEntities(this._cm.state.doc.toString()));
       }
     });
-
-    const parseErrorGutter = [
-      parseErrorState,
-      gutter({
-        class: "cm-parse-error-gutter",
-        markers: v => v.state.field(parseErrorState),
-        initialSpacer: () => parseErrorMarker,
-      }),
-      EditorView.baseTheme({
-        ".cm-parse-error-gutter .cm-gutterElement": {
-          color: "red",
-          paddingLeft: "5px",
-          cursor: "default"
-        }
-      })
-    ]
 
     this._cm = new EditorView({
       root: this.renderRoot,
@@ -232,7 +181,6 @@ export class BcDatalogEditor extends LitElement {
           keymap.of([...defaultKeymap, ...historyKeymap]),
           updateListenerExtension,
           StreamLanguage.define(biscuit_mode),
-          parseErrorGutter,
           markField,
         ]
       }),
@@ -257,30 +205,19 @@ export class BcDatalogEditor extends LitElement {
       }
     }
 
+    resetAllMarks(this._cm);
     if(changedProperties.has('parseErrors')) {
-      console.log("got parseErrors");
-      resetParseError(this._cm);
-
-      console.log(this.parseErrors);
-      let errs = changedProperties.get('parseErrors');
-      if(changedProperties.has('parseErrors')) {
-        for (let error of this.parseErrors) {
-          setParseError(this._cm, error.from);
-        }
+      for (let error of this.parseErrors) {
+        setParseErrorMark(this._cm, error.from, error.to);
       }
     }
 
     if(changedProperties.has('markers')) {
-      resetAllMarks(this._cm);
-
-
-      if(changedProperties.has('markers')) {
-        for(let mark of this.markers) {
-          if(mark.ok) {
-            setSuccessMark(this._cm, mark.start, mark.end);
-          } else {
-            setFailureMark(this._cm, mark.start, mark.end);
-          }
+      for(let mark of this.markers) {
+        if(mark.ok) {
+          setSuccessMark(this._cm, mark.start, mark.end);
+        } else {
+          setFailureMark(this._cm, mark.start, mark.end);
         }
       }
     }
