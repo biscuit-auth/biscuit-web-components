@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "author": "Geoffroy Couprie",
   "module": "src/index.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "start": "wds --node-resolve --open demo/ --open",
     "serve": "wds --node-resolve --open demo/ --watch",
@@ -19,7 +19,7 @@
     "@codemirror/rangeset": "^0.19.2",
     "@codemirror/stream-parser": "^0.19.2",
     "@codemirror/theme-one-dark": "^0.19.1",
-    "@geal/biscuit-component-wasm": "^0.1.2",
+    "@geal/biscuit-component-wasm": "0.2.0",
     "lit": "^2.0.0",
     "lit-analyzer": "^1.2.1"
   },
