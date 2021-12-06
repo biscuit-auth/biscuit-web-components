@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "author": "Geoffroy Couprie",
   "module": "src/index.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "start": "wds --node-resolve --open demo/ --open",
     "serve": "wds --node-resolve --open demo/ --watch",
