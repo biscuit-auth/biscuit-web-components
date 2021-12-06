@@ -13,21 +13,19 @@ export class BcTokenPrinter extends LitElement {
     return {
       biscuit: { type: String },
       _blocks: { type: Array },
+      _error: { type: String },
       started: { type: Boolean },
-      parseErrors: { type: Array },
-      markers: { type: Array },
     };
   }
 
   constructor () {
     super();
     this._blocks = [];
+    this._error = "";
     for(const child of Array.from(this.children)) {
       this._blocks.push({ code: child.innerHTML });
     }
 
-    this.parseErrors = [];
-    this.markers = [];
     this.started = false;
   }
 
@@ -65,7 +63,7 @@ export class BcTokenPrinter extends LitElement {
         });
       }
 
-      if(result.error !== undefined && result.error !== null) {
+      if(result.error !== undefined && result.error !== null && result.error != "") {
         return html`
           <code>${this.biscuit}</code>
           <div>${result.error}</div>`
