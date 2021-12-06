@@ -193,6 +193,7 @@ export class BcFullExample extends LitElement {
       :host {
         display: flex;
         flex-direction: column;
+        text-align: left;
       }
 
       @media(min-width:576px) {

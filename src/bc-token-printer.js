@@ -109,6 +109,7 @@ export class BcTokenPrinter extends LitElement {
         :host {
           display: flex;
           flex-direction: column;
+          text-align: left;
         }
 
         @media(min-width:576px) {
