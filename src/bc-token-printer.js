@@ -65,23 +65,40 @@ export class BcTokenPrinter extends LitElement {
 
       if(result.error !== undefined && result.error !== null && result.error != "") {
         return html`
-          <code>${this.biscuit}</code>
-          <div>${result.error}</div>`
+          <div class="code">
+            <p>Encoded token</p>
+            <code>${this.biscuit}</code>
+          </div>
+            <div class="content">${result.error}</div>
+          `
       } else {
         return html`
-          <code>${this.biscuit}</code>
-          ${this._blocks.map((block, index) => html`
-            <bc-datalog-editor
-              datalog=${block.code}
-              @bc-datalog-editor:update="${(e) => { this._onUpdatedCode(block, e.detail.code) }}"}>
-            </bc-datalog-editor>
-          `)}
-        `;
+            <div class="code">
+              <p>Encoded token</p>
+              <code>${this.biscuit}</code>
+            </div>
+            <div class="content">
+            <p>Decoded token</p>
+            ${this._blocks.map((block, index) => html`
+              <div>
+              <p>Block ${index}:</p>
+              <bc-datalog-editor
+                datalog=${block.code}
+                @bc-datalog-editor:update="${(e) => { this._onUpdatedCode(block, e.detail.code) }}"}>
+              </bc-datalog-editor>
+              </div>
+            `)}
+            </div>
+         `;
       }
     } else {
       return html`
+      <div class="code">
+        <p>Encoded token</p>
         <code>${this.biscuit}</code>
-        <div>empty</div>`
+      </div>
+        <div class="content">empty</div>
+     `
     }
   }
 
@@ -90,7 +107,56 @@ export class BcTokenPrinter extends LitElement {
       // language=CSS
       css`
         :host {
-          display: block;
+          display: flex;
+          flex-direction: column;
+        }
+
+        @media(min-width:576px) {
+          :host {
+            display: flex;
+            flex-flow: row wrap;
+            flex-direction: row;
+          }
+
+          .code {
+            order: 1;
+            width: 49%;
+          }
+
+          .content {
+            order: 2;
+            width: 49%;
+          }
+        }
+
+        code {
+          overflow-wrap: anywhere;
+          padding: 0.2em;
+          padding-top: 1em;
+        }
+
+        .code {
+          background: white;
+          border: 1px rgba(128, 128, 128, 0.4) solid;
+        }
+
+        .content {
+          border-top: 1px rgba(128, 128, 128, 0.4) solid;
+          border-right: 1px rgba(128, 128, 128, 0.4) solid;
+          background: white;
+        }
+
+        p {
+          border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+          margin-block-start: 0px;
+          margin-block-end: 0px;
+          padding: 0.2em;
+          font-size: 0.8em;
+          color: grey;
+        }
+
+        bc-datalog-editor {
+          border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
         }
       `,
     ];
