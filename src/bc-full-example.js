@@ -154,7 +154,10 @@ export class BcFullExample extends LitElement {
     }
 
     return html`
+      <div class="blocks">
+      <p>Token</p>
       ${this.blocks.map((block, index) => html`
+        <p>Block ${index}</p>
         <bc-datalog-editor
           datalog=${block.code}
           parseErrors='${JSON.stringify(blockParseErrors[index])}'
@@ -162,20 +165,24 @@ export class BcFullExample extends LitElement {
           @bc-datalog-editor:update="${(e) => { this._onUpdatedBlock(index, e.detail.code) }}"}>
         </bc-datalog-editor>
       `)}
+      </div>
 
-      <bc-authorizer-editor
-        code='${this._authorizer}'
-        parseErrors='${JSON.stringify(parseErrors)}'
-        markers='${JSON.stringify(markers)}'
-        @bc-authorizer-editor:update="${(e) => { this._onUpdatedAuthorizer(e.detail.code) }}"}>
-      </bc-authorizer-editor>
+      <div class="authorizer">
+        <p>Authorizer policies</p>
+        <bc-authorizer-editor
+          code='${this._authorizer}'
+          parseErrors='${JSON.stringify(parseErrors)}'
+          markers='${JSON.stringify(markers)}'
+          @bc-authorizer-editor:update="${(e) => { this._onUpdatedAuthorizer(e.detail.code) }}"}>
+        </bc-authorizer-editor>
 
-      <em>Execution result</em>
-      <bc-authorizer-result content='${JSON.stringify(result.authorizer_result)}'></bc-authorizer-result>
-      <details>
-        <summary>Facts</summary>
-        <bc-authorizer-content content='${JSON.stringify(result.authorizer_world)}'></bc-authorizer-content>
-      </details>
+        <em>Execution result</em>
+        <bc-authorizer-result content='${JSON.stringify(result.authorizer_result)}'></bc-authorizer-result>
+        <details>
+          <summary>Facts</summary>
+          <bc-authorizer-content content='${JSON.stringify(result.authorizer_world)}'></bc-authorizer-content>
+        </details>
+      </div>
     `;
   }
 
@@ -183,9 +190,56 @@ export class BcFullExample extends LitElement {
     return [
       // language=CSS
       css`
+      :host {
+        display: flex;
+        flex-direction: column;
+      }
+
+      @media(min-width:576px) {
         :host {
-          display: block;
+          display: flex;
+          flex-flow: row wrap;
+          flex-direction: row;
         }
+
+        .blocks {
+          order: 1;
+          width: 49%;
+        }
+
+        .authorizer {
+          order: 2;
+          width: 49%;
+        }
+      }
+
+      .blocks {
+        background: white;
+        border: 1px rgba(128, 128, 128, 0.4) solid;
+      }
+      .authorizer {
+        background: white;
+        border-top: 1px rgba(128, 128, 128, 0.4) solid;
+        border-right: 1px rgba(128, 128, 128, 0.4) solid;
+        border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+      }
+
+      p {
+        margin-block-start: 0px;
+        margin-block-end: 0px;
+        padding: 0.2em;
+        font-size: 0.8em;
+        color: grey;
+        border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+      }
+
+      bc-datalog-editor {
+        border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+      }
+
+      bc-authorizer-editor {
+        border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+      }
       `,
     ];
   }
