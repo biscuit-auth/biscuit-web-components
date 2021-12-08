@@ -144,6 +144,7 @@ export class BcDatalogEditor extends LitElement {
 
   static get properties () {
     return {
+      readonly: { type: Boolean },
       datalog: { type: String },
       parseErrors: { type: Array },
       markers: { type: Array },
@@ -152,6 +153,7 @@ export class BcDatalogEditor extends LitElement {
 
   constructor () {
     super();
+    this.readonly = this.readonly === true;
     this.parseErrors = [];
     this.markers = [];
   }
@@ -178,6 +180,7 @@ export class BcDatalogEditor extends LitElement {
           basicSetup,
           lineNumbers(),
           history(),
+          EditorView.editable.of(!this.readonly),
           keymap.of([...defaultKeymap, ...historyKeymap]),
           updateListenerExtension,
           StreamLanguage.define(biscuit_mode),
