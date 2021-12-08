@@ -27,7 +27,7 @@ export class BcAuthorizerContent extends LitElement {
 
     return html`
       <div>${
-        Object.keys(facts_map).map(function(key, index) {
+        Object.keys(facts_map).sort().map(function(key, index) {
 
           return html`<table><thead><tr><th>${key}</th></tr></thead><tbody>
             ${facts_map[key].map((terms) => {

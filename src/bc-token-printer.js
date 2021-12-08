@@ -84,6 +84,7 @@ export class BcTokenPrinter extends LitElement {
               <p>Block ${index}:</p>
               <bc-datalog-editor
                 datalog=${block.code}
+                readonly="true"
                 @bc-datalog-editor:update="${(e) => { this._onUpdatedCode(block, e.detail.code) }}"}>
               </bc-datalog-editor>
               </div>
