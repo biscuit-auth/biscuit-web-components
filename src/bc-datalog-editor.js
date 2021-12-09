@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit-element';
+import { css, html, LitElement } from 'lit';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 
 import {keymap, EditorView, Range, Decoration} from "@codemirror/view"
