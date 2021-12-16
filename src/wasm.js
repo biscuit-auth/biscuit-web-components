@@ -1,4 +1,4 @@
-import init from '@geal/biscuit-component-wasm';
+import init from '@biscuit-auth/biscuit-wasm-support';
 
 let loadPromise = null;
 export async function initialize() {

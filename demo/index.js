@@ -3,7 +3,7 @@ import '/src/bc-token-content.js';
 import '/src/bc-authorizer-editor.js';
 import '/src/bc-authorizer-result.js';
 import '/src/bc-authorizer-content.js';
-import init, {execute} from "@geal/biscuit-component-wasm"
+import init, {execute} from "@biscuit-auth/biscuit-wasm-support"
 
 
 var state = {

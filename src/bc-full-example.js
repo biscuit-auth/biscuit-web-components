@@ -1,7 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
-import {execute,parse_token} from "@geal/biscuit-component-wasm"
+import {execute,parse_token} from "@biscuit-auth/biscuit-wasm-support"
 import './bc-authorizer-editor.js';
 import './bc-authorizer-result.js';
 import './bc-authorizer-content.js';
