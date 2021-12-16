@@ -1,4 +1,4 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement, PropertyValues } from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import './bc-datalog-editor.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
@@ -17,11 +17,11 @@ export class BcTokenPrinter extends LitElement {
   @state()
   _started = false;
 
-  firstUpdated(changedProperties) {
+  firstUpdated(changedProperties: PropertyValues) {
     initialize().then(() => this._started = true);
   }
 
-  _onUpdatedToken(e) {
+  _onUpdatedToken(e: any) {
     this.biscuit = e.target.value.trim();
   }
 
@@ -48,7 +48,7 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderResult (error, blocks) {
+  renderResult (error: String, blocks: Array<{code: String}>) {
     if(this.biscuit === "") {
       return html`
        ${this.renderTokenInput()}
@@ -84,7 +84,7 @@ export class BcTokenPrinter extends LitElement {
     if(!this._started) return this.renderNotStarted();
 
     const result = parse_token({ data: this.biscuit});
-    const blocks = result.token_blocks.map(code => ({code}))
+    const blocks = result.token_blocks.map((code: String) => ({code}))
 
     return this.renderResult(result.error, blocks);
   }
