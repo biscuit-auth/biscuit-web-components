@@ -1,7 +1,6 @@
-import { css, html, LitElement, PropertyValues } from 'lit';
+import { css, html, LitElement } from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import './bc-datalog-editor.js';
-import { dispatchCustomEvent } from '../src/lib/events.js';
 import {initialize} from './wasm.js';
 import {parse_token} from "@biscuit-auth/biscuit-wasm-support";
 
@@ -17,12 +16,12 @@ export class BcTokenPrinter extends LitElement {
   @state()
   _started = false;
 
-  firstUpdated(changedProperties: PropertyValues) {
+  firstUpdated() {
     initialize().then(() => this._started = true);
   }
 
-  _onUpdatedToken(e: any) {
-    this.biscuit = e.target.value.trim();
+  _onUpdatedToken(e: InputEvent) {
+    this.biscuit = (e.target as HTMLInputElement).value.trim();
   }
 
   renderTokenInput () {
@@ -48,7 +47,7 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderResult (error: String, blocks: Array<{code: String}>) {
+  renderResult (error: string, blocks: Array<{code: string}>) {
     if(this.biscuit === "") {
       return html`
        ${this.renderTokenInput()}
@@ -84,7 +83,7 @@ export class BcTokenPrinter extends LitElement {
     if(!this._started) return this.renderNotStarted();
 
     const result = parse_token({ data: this.biscuit});
-    const blocks = result.token_blocks.map((code: String) => ({code}))
+    const blocks = result.token_blocks.map((code: string) => ({code}))
 
     return this.renderResult(result.error, blocks);
   }
