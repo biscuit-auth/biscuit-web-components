@@ -1,30 +1,29 @@
-import { css, html, LitElement } from 'lit';
-import {customElement, property, state} from 'lit/decorators.js';
-import './bc-datalog-editor.js';
-import {initialize} from './wasm.js';
-import {parse_token} from "@biscuit-auth/biscuit-wasm-support";
+import { css, html, LitElement } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
+import "./bc-datalog-editor.js";
+import { initialize } from "./wasm.js";
+import { parse_token } from "@biscuit-auth/biscuit-wasm-support";
 
 /**
  * TODO DOCS
  */
-@customElement('bc-token-printer')
+@customElement("bc-token-printer")
 export class BcTokenPrinter extends LitElement {
-
   @property()
-  biscuit = '';
+  biscuit = "";
 
   @state()
   _started = false;
 
   firstUpdated() {
-    initialize().then(() => this._started = true);
+    initialize().then(() => (this._started = true));
   }
 
   _onUpdatedToken(e: InputEvent) {
     this.biscuit = (e.target as HTMLInputElement).value.trim();
   }
 
-  renderTokenInput () {
+  renderTokenInput() {
     return html`
       <div class="code">
         <p>Encoded token</p>
@@ -33,40 +32,41 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderNotStarted () {
+  renderNotStarted() {
     return html`
-     ${this.renderTokenInput()}
-     <div class="content">loading biscuit token</div>
+      ${this.renderTokenInput()}
+      <div class="content">loading biscuit token</div>
     `;
   }
 
-  renderEmptyToken () {
+  renderEmptyToken() {
     return html`
-     ${this.renderTokenInput()}
-     <div class="content">Please enter a base64-encoded token</div>
+      ${this.renderTokenInput()}
+      <div class="content">Please enter a base64-encoded token</div>
     `;
   }
 
-  renderResult (error: string, blocks: Array<{code: string}>) {
-    if(this.biscuit === "") {
+  renderResult(error: string, blocks: Array<{ code: string }>) {
+    if (this.biscuit === "") {
       return html`
-       ${this.renderTokenInput()}
-       <div class="content">Please enter a base64-encoded token</div>
+        ${this.renderTokenInput()}
+        <div class="content">Please enter a base64-encoded token</div>
       `;
     }
 
-    if(error) {
+    if (error) {
       return html`
-     ${this.renderTokenInput()}
-     <div class="content">${error}</div>
+        ${this.renderTokenInput()}
+        <div class="content">${error}</div>
       `;
     }
 
     return html`
-     ${this.renderTokenInput()}
+      ${this.renderTokenInput()}
       <div class="content">
-      <p>Decoded token</p>
-      ${blocks.map((block, index) => html`
+        <p>Decoded token</p>
+        ${blocks.map(
+          (block, index) => html`
         <div>
         <p>Block ${index}:</p>
         <bc-datalog-editor
@@ -74,81 +74,81 @@ export class BcTokenPrinter extends LitElement {
           readonly="true"
         </bc-datalog-editor>
         </div>
-      `)}
+      `
+        )}
       </div>
-      `;
+    `;
   }
 
-  render () {
-    if(!this._started) return this.renderNotStarted();
+  render() {
+    if (!this._started) return this.renderNotStarted();
 
-    const result = parse_token({ data: this.biscuit});
-    const blocks = result.token_blocks.map((code: string) => ({code}))
+    const result = parse_token({ data: this.biscuit });
+    const blocks = result.token_blocks.map((code: string) => ({ code }));
 
     return this.renderResult(result.error, blocks);
   }
 
   static styles = css`
-        :host {
-          display: flex;
-          flex-direction: column;
-          text-align: left;
-        }
+    :host {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
 
-        @media(min-width:576px) {
-          :host {
-            display: flex;
-            flex-flow: row wrap;
-            flex-direction: row;
-          }
+    @media (min-width: 576px) {
+      :host {
+        display: flex;
+        flex-flow: row wrap;
+        flex-direction: row;
+      }
 
-          .code {
-            order: 1;
-            width: 49%;
-          }
+      .code {
+        order: 1;
+        width: 49%;
+      }
 
-          .content {
-            order: 2;
-            width: 49%;
-          }
-        }
+      .content {
+        order: 2;
+        width: 49%;
+      }
+    }
 
-        code {
-          overflow-wrap: anywhere;
-          padding: 0.2em;
-          padding-top: 1em;
-        }
+    code {
+      overflow-wrap: anywhere;
+      padding: 0.2em;
+      padding-top: 1em;
+    }
 
+    .code {
+      background: white;
+      border: 1px rgba(128, 128, 128, 0.4) solid;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .code {
-          background: white;
-          border: 1px rgba(128, 128, 128, 0.4) solid;
-          display: flex;
-          flex-direction: column;
-        }
+    textarea {
+      flex-grow: 1;
+      border: 0;
+    }
 
-        textarea {
-          flex-grow: 1;
-          border: 0;
-        }
+    .content {
+      border-top: 1px rgba(128, 128, 128, 0.4) solid;
+      border-right: 1px rgba(128, 128, 128, 0.4) solid;
+      background: white;
+    }
 
-        .content {
-          border-top: 1px rgba(128, 128, 128, 0.4) solid;
-          border-right: 1px rgba(128, 128, 128, 0.4) solid;
-          background: white;
-        }
+    p {
+      border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+      margin-block-start: 0px;
+      margin-block-end: 0px;
+      padding: 0.2em;
+      font-size: 0.8em;
+      color: grey;
+    }
 
-        p {
-          border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
-          margin-block-start: 0px;
-          margin-block-end: 0px;
-          padding: 0.2em;
-          font-size: 0.8em;
-          color: grey;
-        }
-
-        bc-datalog-editor {
-          border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
-        }
-      `;
+    bc-datalog-editor {
+      border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
+    }
+  `;
 }
