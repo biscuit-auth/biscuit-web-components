@@ -3,7 +3,7 @@ import {customElement, property, state} from 'lit/decorators.js';
 import './bc-datalog-editor.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 import {initialize} from './wasm.js';
-import {parse_token} from "@geal/biscuit-component-wasm";
+import {parse_token} from "@biscuit-auth/biscuit-wasm-support";
 
 /**
  * TODO DOCS
