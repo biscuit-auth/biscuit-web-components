@@ -1,13 +1,12 @@
-import { css, html, LitElement } from 'lit';
-import './bc-datalog-editor.js';
-import { dispatchCustomEvent } from '../src/lib/events.js';
+import { css, html, LitElement } from "lit";
+import "./bc-datalog-editor.js";
+import { dispatchCustomEvent } from "../src/lib/events.js";
 
 /**
  * TODO DOCS
  */
 export class BcAuthorizerEditor extends LitElement {
-
-  static get properties () {
+  static get properties() {
     return {
       code: { type: String },
       parseErrors: { type: Array },
@@ -15,9 +14,9 @@ export class BcAuthorizerEditor extends LitElement {
     };
   }
 
-  constructor () {
+  constructor() {
     super();
-    if(this.children[0] != undefined) {
+    if (this.children[0] != undefined) {
       this.code = this.children[0].innerHTML;
     } else {
       this.code = "";
@@ -28,25 +27,29 @@ export class BcAuthorizerEditor extends LitElement {
 
   _onUpdatedCode(code) {
     this.code = code;
-    dispatchCustomEvent(this, 'update', {code: code});
+    dispatchCustomEvent(this, "update", { code: code });
   }
 
-  update (changedProperties) {
+  update(changedProperties) {
     super.update(changedProperties);
   }
 
-  render () {
+  render() {
     return html`
       <bc-datalog-editor
         datalog=${this.code}
-        parseErrors='${JSON.stringify(this.parseErrors)}'
-        markers='${JSON.stringify(this.markers)}'
-        @bc-datalog-editor:update="${(e) => { this._onUpdatedCode(e.detail.code) }}"}>
+        parseErrors="${JSON.stringify(this.parseErrors)}"
+        markers="${JSON.stringify(this.markers)}"
+        @bc-datalog-editor:update="${(e) => {
+          this._onUpdatedCode(e.detail.code);
+        }}"
+        }
+      >
       </bc-datalog-editor>
     `;
   }
 
-  static get styles () {
+  static get styles() {
     return [
       // language=CSS
       css`
@@ -58,4 +61,4 @@ export class BcAuthorizerEditor extends LitElement {
   }
 }
 
-window.customElements.define('bc-authorizer-editor', BcAuthorizerEditor);
+window.customElements.define("bc-authorizer-editor", BcAuthorizerEditor);

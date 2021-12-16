@@ -15,7 +15,8 @@
     "test": "wtr test/**/*.test.js --node-resolve",
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve",
     "build": "tsc",
-    "prepublishOnly": "tsc && tsc -p tsconfig-cjs.json"
+    "prepublishOnly": "tsc && tsc -p tsconfig-cjs.json",
+    "ci": "tsc && eslint src --ext .ts && prettier -c src"
   },
   "dependencies": {
     "@biscuit-auth/biscuit-wasm-support": "0.2.1",
@@ -26,6 +27,8 @@
     "@codemirror/rangeset": "^0.19.2",
     "@codemirror/stream-parser": "^0.19.2",
     "@codemirror/theme-one-dark": "^0.19.1",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
     "lit": "^2.0.0",
     "lit-analyzer": "^1.2.1",
     "tslib": "2.3.1"
@@ -35,6 +38,8 @@
     "@web/dev-server": "^0.1.28",
     "@web/dev-server-esbuild": "^0.2.16",
     "@web/test-runner": "^0.13.22",
+    "eslint": "^8.4.1",
+    "prettier": "^2.5.1",
     "tslib": "2.3.1",
     "typescript": "4.5.2"
   },

@@ -1,28 +1,25 @@
-import { css, html, LitElement } from 'lit';
+import { css, html, LitElement } from "lit";
 
 /**
  * TODO DOCS
  */
 export class BcTokenContent extends LitElement {
-
-  static get properties () {
+  static get properties() {
     return {
       content: { type: Object },
     };
   }
 
-  constructor () {
+  constructor() {
     super();
   }
 
-  render () {
-    const content = (this.content == null) ? 'no content yet' : this.content;
-    return html`
-      <div><pre>${content}</pre></div>
-    `;
+  render() {
+    const content = this.content == null ? "no content yet" : this.content;
+    return html` <div><pre>${content}</pre></div> `;
   }
 
-  static get styles () {
+  static get styles() {
     return [
       // language=CSS
       css`
@@ -34,4 +31,4 @@ export class BcTokenContent extends LitElement {
   }
 }
 
-window.customElements.define('bc-token-content', BcTokenContent);
+window.customElements.define("bc-token-content", BcTokenContent);
