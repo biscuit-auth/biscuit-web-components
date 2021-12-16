@@ -6,7 +6,7 @@ import './bc-authorizer-result.js';
 import './bc-authorizer-content.js';
 import './bc-authorizer-example.js';
 import './bc-datalog-example.js';
-import './bc-token-printer.js';
+import './bc-token-printer';
 import './bc-full-example.js';
 export {execute} from "@geal/biscuit-component-wasm";
 export {initialize} from './wasm.js';

@@ -1,15 +1,21 @@
 {
   "name": "@geal/biscuit-web-components",
   "type": "module",
-  "main": "src/index.js",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/esm/src/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "author": "Geoffroy Couprie",
-  "module": "src/index.js",
   "version": "0.3.3",
   "scripts": {
-    "start": "wds --node-resolve --open demo/ --open",
+    "start": "wds --node-resolve --open demo/",
     "serve": "wds --node-resolve --open demo/ --watch",
     "test": "wtr test/**/*.test.js --node-resolve",
-    "test:watch": "wtr --watch test/**/*.test.js --node-resolve"
+    "test:watch": "wtr --watch test/**/*.test.js --node-resolve",
+    "build": "tsc",
+    "prepublishOnly": "tsc && tsc -p tsconfig-cjs.json"
   },
   "dependencies": {
     "@codemirror/basic-setup": "^0.19.0",
@@ -21,12 +27,16 @@
     "@codemirror/theme-one-dark": "^0.19.1",
     "@geal/biscuit-component-wasm": "0.2.0",
     "lit": "^2.0.0",
-    "lit-analyzer": "^1.2.1"
+    "lit-analyzer": "^1.2.1",
+    "tslib": "2.3.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@web/dev-server": "^0.1.28",
-    "@web/test-runner": "^0.13.22"
+    "@web/dev-server-esbuild": "^0.2.16",
+    "@web/test-runner": "^0.13.22",
+    "tslib": "2.3.1",
+    "typescript": "4.5.2"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 import { css, html, LitElement } from 'lit';
+import {customElement, property, state} from 'lit/decorators.js';
 import './bc-datalog-editor.js';
 import { dispatchCustomEvent } from '../src/lib/events.js';
 import {initialize} from './wasm.js';
@@ -7,35 +8,17 @@ import {parse_token} from "@geal/biscuit-component-wasm";
 /**
  * TODO DOCS
  */
+@customElement('bc-token-printer')
 export class BcTokenPrinter extends LitElement {
 
-  static get properties () {
-    return {
-      biscuit: { type: String },
-      _blocks: { type: Array },
-      _error: { type: String },
-      started: { type: Boolean },
-    };
-  }
+  @property()
+  biscuit = '';
 
-  constructor () {
-    super();
-    this._blocks = [];
-    this._error = "";
-    this.biscuit = this.biscuit ?? "";
-    for(const child of Array.from(this.children)) {
-      this._blocks.push({ code: child.innerHTML });
-    }
-
-    this.started = false;
-  }
+  @state()
+  _started = false;
 
   firstUpdated(changedProperties) {
-    initialize().then(() => this.started = true);
-  }
-
-  update (changedProperties) {
-    super.update(changedProperties);
+    initialize().then(() => this._started = true);
   }
 
   _onUpdatedToken(e) {
@@ -65,8 +48,7 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderResult () {
-    console.log([this.error, this._blocks]);
+  renderResult (error, blocks) {
     if(this.biscuit === "") {
       return html`
        ${this.renderTokenInput()}
@@ -74,10 +56,10 @@ export class BcTokenPrinter extends LitElement {
       `;
     }
 
-    if(this.error) {
+    if(error) {
       return html`
      ${this.renderTokenInput()}
-     <div class="content">${this.error}</div>
+     <div class="content">${error}</div>
       `;
     }
 
@@ -85,7 +67,7 @@ export class BcTokenPrinter extends LitElement {
      ${this.renderTokenInput()}
       <div class="content">
       <p>Decoded token</p>
-      ${this._blocks.map((block, index) => html`
+      ${blocks.map((block, index) => html`
         <div>
         <p>Block ${index}:</p>
         <bc-datalog-editor
@@ -99,27 +81,15 @@ export class BcTokenPrinter extends LitElement {
   }
 
   render () {
-    if(!this.started) return this.renderNotStarted();
+    if(!this._started) return this.renderNotStarted();
 
     const result = parse_token({ data: this.biscuit});
-    console.log("parsed");
-    console.log(result);
-    this.error = result.error;
-    this._blocks = [];
+    const blocks = result.token_blocks.map(code => ({code}))
 
-    for(let block of result.token_blocks) {
-      this._blocks.push({
-        code: block
-      });
-    }
-
-    return this.renderResult();
+    return this.renderResult(result.error, blocks);
   }
 
-  static get styles () {
-    return [
-      // language=CSS
-      css`
+  static styles = css`
         :host {
           display: flex;
           flex-direction: column;
@@ -181,9 +151,5 @@ export class BcTokenPrinter extends LitElement {
         bc-datalog-editor {
           border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
         }
-      `,
-    ];
-  }
+      `;
 }
-
-window.customElements.define('bc-token-printer', BcTokenPrinter);
