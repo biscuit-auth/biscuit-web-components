@@ -17,35 +17,54 @@ export class BcAuthorizerContent extends LitElement {
 
   render() {
     var facts_map = {};
+    var facts = "";
+    var current_name;
     for (let fact of this.content) {
       if (facts_map[fact.name] == undefined) {
         facts_map[fact.name] = [];
       }
       facts_map[fact.name].push(fact.terms);
+
+
+      if(current_name == undefined) {
+        current_name = fact.name;
+      }
+
+      if (fact.name != current_name) {
+        facts += "\n";
+        current_name = fact.name;
+      }
+
+      facts += fact.name + "("+fact.terms+");\n";
     }
+
+
+    console.log(facts);
 
     return html`
       <div>
+        <textarea>${facts}</textarea>
+      </div>`;
+    /*
+    return html`
+      <div>
+        <table>
         ${Object.keys(facts_map)
           .sort()
           .map(function (key, index) {
-            return html`<table>
-              <thead>
-                <tr>
-                  <th>${key}</th>
-                </tr>
-              </thead>
-              <tbody>
+            return html`
                 ${facts_map[key].map((terms) => {
                   return html`<tr>
+                    <th>${key}</th>
                     ${terms.map((term) => html`<td>${term}</td>`)}
                   </tr>`;
                 })}
-              </tbody>
-            </table>`;
+            `;
           })}
+        </table> -->
       </div>
     `;
+    */
   }
 
   static get styles() {
@@ -54,6 +73,11 @@ export class BcAuthorizerContent extends LitElement {
       css`
         :host {
           display: block;
+        }
+
+        textarea {
+          width: 100%;
+          min-height: 100px;
         }
 
         table,
