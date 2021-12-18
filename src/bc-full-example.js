@@ -209,6 +209,24 @@ export class BcFullExample extends LitElement {
           text-align: left;
         }
 
+        @media (prefers-color-scheme: dark) {
+          :host {
+            color: #dee2e6;
+            background: #131314;
+          }
+          textarea {
+            color: #dee2e6;
+            background: #131314;
+          }
+        }
+
+        @media (prefers-color-scheme: light) {
+          :host {
+            color: #1d2d35;
+            background: #fff;
+          }
+        }
+
         @media (min-width: 576px) {
           :host {
             display: flex;
@@ -228,11 +246,9 @@ export class BcFullExample extends LitElement {
         }
 
         .blocks {
-          background: white;
           border: 1px rgba(128, 128, 128, 0.4) solid;
         }
         .authorizer {
-          background: white;
           border-top: 1px rgba(128, 128, 128, 0.4) solid;
           border-right: 1px rgba(128, 128, 128, 0.4) solid;
           border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
@@ -243,7 +259,6 @@ export class BcFullExample extends LitElement {
           margin-block-end: 0px;
           padding: 0.2em;
           font-size: 0.8em;
-          color: grey;
           border-bottom: 1px rgba(128, 128, 128, 0.4) solid;
         }
 

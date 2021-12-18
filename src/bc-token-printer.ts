@@ -96,6 +96,24 @@ export class BcTokenPrinter extends LitElement {
       text-align: left;
     }
 
+    @media (prefers-color-scheme: dark) {
+      :host {
+        color: #dee2e6;
+        background: #131314;
+      }
+      textarea {
+        color: #dee2e6;
+        background: #131314;
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      :host {
+        color: #1d2d35;
+        background: #fff;
+      }
+    }
+
     @media (min-width: 576px) {
       :host {
         display: flex;
@@ -121,7 +139,6 @@ export class BcTokenPrinter extends LitElement {
     }
 
     .code {
-      background: white;
       border: 1px rgba(128, 128, 128, 0.4) solid;
       display: flex;
       flex-direction: column;
@@ -135,7 +152,6 @@ export class BcTokenPrinter extends LitElement {
     .content {
       border-top: 1px rgba(128, 128, 128, 0.4) solid;
       border-right: 1px rgba(128, 128, 128, 0.4) solid;
-      background: white;
     }
 
     p {
@@ -144,7 +160,6 @@ export class BcTokenPrinter extends LitElement {
       margin-block-end: 0px;
       padding: 0.2em;
       font-size: 0.8em;
-      color: grey;
     }
 
     bc-datalog-editor {

@@ -252,7 +252,58 @@ export class BcDatalogEditor extends LitElement {
       css`
         :host {
           display: block;
-          background: white;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :host {
+            background: #131314;
+            color: #dee2e6;
+          }
+
+          .ͼ2 .cm-gutters {
+            background-color: rgb(21 21 21);
+            color: rgb(216 216 216);
+            border-right: 1px solid rgb(221, 221, 221);
+          }
+
+          .ͼ2 .cm-activeLineGutter {
+            background-color: rgb(71 77 82);
+          }
+
+          .cm-activeLine {
+            background: rgb(69 69 69);
+          }
+
+          .ͼ2 .cm-activeLine {
+            background: rgb(69 69 69);
+          }
+
+          .ͼa {
+            color: rgb(9 161 219);
+          }
+
+          .ͼd {
+            color: rgb(235 23 23);
+          }
+
+          .ͼc {
+            color: rgb(31 178 119);
+          }
+
+          .ͼl {
+            color: rgb(227 101 0);
+          }
+
+          .cm-line ::selection {
+            background: #00000094;
+          }
+        }
+
+        @media (prefers-color-scheme: light) {
+          :host {
+            background: #fff;
+            color: #1d2d35;
+          }
         }
       `,
     ];
