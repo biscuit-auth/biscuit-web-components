@@ -43,28 +43,8 @@ export class BcAuthorizerContent extends LitElement {
 
     return html`
       <div>
-        <textarea>${facts}</textarea>
+        <bc-datalog-editor datalog=${facts} readonly=true></bc-datalog-editor>
       </div>`;
-    /*
-    return html`
-      <div>
-        <table>
-        ${Object.keys(facts_map)
-          .sort()
-          .map(function (key, index) {
-            return html`
-                ${facts_map[key].map((terms) => {
-                  return html`<tr>
-                    <th>${key}</th>
-                    ${terms.map((term) => html`<td>${term}</td>`)}
-                  </tr>`;
-                })}
-            `;
-          })}
-        </table> -->
-      </div>
-    `;
-    */
   }
 
   static get styles() {
@@ -73,40 +53,6 @@ export class BcAuthorizerContent extends LitElement {
       css`
         :host {
           display: block;
-        }
-
-        textarea {
-          width: 100%;
-          min-height: 100px;
-        }
-
-        table,
-        td {
-          border: 1px solid #fff;
-          color: #000;
-          margin-bottom: 10px;
-        }
-
-        thead,
-        tfoot {
-          background-color: #333;
-          color: #fff;
-        }
-
-        tbody tr:nth-child(odd) {
-          background-color: #dfe4ed;
-        }
-
-        tbody tr:nth-child(even) {
-          background-color: #fff;
-        }
-
-        td,
-        th {
-          padding-left: 10px;
-          padding-right: 10px;
-          padding-top: 5px;
-          padding-bottom: 3px;
         }
       `,
     ];
