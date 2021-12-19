@@ -17,35 +17,34 @@ export class BcAuthorizerContent extends LitElement {
 
   render() {
     var facts_map = {};
+    var facts = "";
+    var current_name;
     for (let fact of this.content) {
       if (facts_map[fact.name] == undefined) {
         facts_map[fact.name] = [];
       }
       facts_map[fact.name].push(fact.terms);
+
+
+      if(current_name == undefined) {
+        current_name = fact.name;
+      }
+
+      if (fact.name != current_name) {
+        facts += "\n";
+        current_name = fact.name;
+      }
+
+      facts += fact.name + "("+fact.terms+");\n";
     }
+
+
+    console.log(facts);
 
     return html`
       <div>
-        ${Object.keys(facts_map)
-          .sort()
-          .map(function (key, index) {
-            return html`<table>
-              <thead>
-                <tr>
-                  <th>${key}</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${facts_map[key].map((terms) => {
-                  return html`<tr>
-                    ${terms.map((term) => html`<td>${term}</td>`)}
-                  </tr>`;
-                })}
-              </tbody>
-            </table>`;
-          })}
-      </div>
-    `;
+        <bc-datalog-editor datalog=${facts} readonly=true></bc-datalog-editor>
+      </div>`;
   }
 
   static get styles() {
@@ -54,35 +53,6 @@ export class BcAuthorizerContent extends LitElement {
       css`
         :host {
           display: block;
-        }
-
-        table,
-        td {
-          border: 1px solid #fff;
-          color: #000;
-          margin-bottom: 10px;
-        }
-
-        thead,
-        tfoot {
-          background-color: #333;
-          color: #fff;
-        }
-
-        tbody tr:nth-child(odd) {
-          background-color: #dfe4ed;
-        }
-
-        tbody tr:nth-child(even) {
-          background-color: #fff;
-        }
-
-        td,
-        th {
-          padding-left: 10px;
-          padding-right: 10px;
-          padding-top: 5px;
-          padding-bottom: 3px;
         }
       `,
     ];
