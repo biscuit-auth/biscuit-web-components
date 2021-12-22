@@ -16,7 +16,8 @@
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve",
     "build": "tsc",
     "prepublishOnly": "tsc && tsc -p tsconfig-cjs.json",
-    "ci": "tsc && eslint src --ext .ts && prettier -c src"
+    "ci": "tsc && eslint src --ext .ts && prettier -c src",
+    "format": "prettier -w src"
   },
   "dependencies": {
     "@biscuit-auth/biscuit-wasm-support": "0.2.1",

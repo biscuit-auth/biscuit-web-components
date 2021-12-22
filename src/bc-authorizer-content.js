@@ -25,8 +25,7 @@ export class BcAuthorizerContent extends LitElement {
       }
       facts_map[fact.name].push(fact.terms);
 
-
-      if(current_name == undefined) {
+      if (current_name == undefined) {
         current_name = fact.name;
       }
 
@@ -35,16 +34,14 @@ export class BcAuthorizerContent extends LitElement {
         current_name = fact.name;
       }
 
-      facts += fact.name + "("+fact.terms+");\n";
+      facts += fact.name + "(" + fact.terms + ");\n";
     }
-
 
     console.log(facts);
 
-    return html`
-      <div>
-        <bc-datalog-editor datalog=${facts} readonly=true></bc-datalog-editor>
-      </div>`;
+    return html` <div>
+      <bc-datalog-editor datalog=${facts} readonly="true"></bc-datalog-editor>
+    </div>`;
   }
 
   static get styles() {
