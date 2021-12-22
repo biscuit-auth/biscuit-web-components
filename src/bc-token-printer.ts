@@ -2,7 +2,8 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
-import { parse_token } from "@biscuit-auth/biscuit-wasm-support";
+import { execute, parse_token } from "@biscuit-auth/biscuit-wasm-support";
+import { LibMarker } from "./types.d";
 
 /**
  * TODO DOCS
@@ -12,18 +13,49 @@ export class BcTokenPrinter extends LitElement {
   @property()
   biscuit = "";
 
+  @property()
+  readonly = false;
+
+  @property()
+  showAuthorizer = false;
+
+  @property()
+  authorizer = "";
+
   @state()
   _started = false;
+
+  constructor() {
+    super();
+    const authorizerChild = this.querySelector(".authorizer");
+    if(authorizerChild !== null) {
+        this.authorizer = authorizerChild.textContent!.trim();
+    }
+  }
 
   firstUpdated() {
     initialize().then(() => (this._started = true));
   }
 
   _onUpdatedToken(e: InputEvent) {
+    if (this.readonly) return;
     this.biscuit = (e.target as HTMLInputElement).value.trim();
   }
 
+  _onUpdatedAuthorizer(e: { detail: { code: string } }) {
+    if (!this.showAuthorizer) return;
+    this.authorizer = e.detail.code;
+  }
+
   renderTokenInput() {
+    if (this.readonly) {
+      return html`
+        <div class="code">
+          <p>Encoded token</p>
+          <code>${this.biscuit}</code>
+        </div>
+      `;
+    }
     return html`
       <div class="code">
         <p>Encoded token</p>
@@ -34,8 +66,10 @@ export class BcTokenPrinter extends LitElement {
 
   renderNotStarted() {
     return html`
-      ${this.renderTokenInput()}
-      <div class="content">loading biscuit token</div>
+      <div class="token">
+        ${this.renderTokenInput()}
+        <div class="content">loading biscuit token</div>
+      </div>
     `;
   }
 
@@ -46,7 +80,11 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderResult(error: string, blocks: Array<{ code: string }>) {
+  renderResult(
+    error: string,
+    blocks: Array<{ code: string }>,
+    blockMarkers: Array<LibMarker>
+  ) {
     if (this.biscuit === "") {
       return html`
         ${this.renderTokenInput()}
@@ -68,9 +106,10 @@ export class BcTokenPrinter extends LitElement {
         ${blocks.map(
           (block, index) => html`
         <div>
-        <p>Block ${index}:</p>
+        <p>${index === 0 ? "Authority block" : `Block ${index}`}:</p>
         <bc-datalog-editor
           datalog=${block.code}
+          markers="${JSON.stringify(blockMarkers[index])}"
           readonly="true"
         </bc-datalog-editor>
         </div>
@@ -80,24 +119,81 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
+  convertMark(marker: LibMarker) {
+    return {
+      from: {
+        line: marker.position.line_start,
+        ch: marker.position.column_start,
+      },
+      to: { line: marker.position.line_end, ch: marker.position.column_end },
+      start: marker.position.start,
+      end: marker.position.end,
+      ok: marker.ok,
+    };
+  }
+
+  renderAuthorizer(markers: Array<LibMarker>, result: string) {
+    if (!this.showAuthorizer) return;
+
+    return html`
+      <div class="code">
+        <p>Authorizer</p>
+        <bc-authorizer-editor
+          code="${this.authorizer}"
+          markers="${JSON.stringify(markers.map(this.convertMark))}"
+          @bc-authorizer-editor:update=${this._onUpdatedAuthorizer}
+        >
+        </bc-authorizer-editor>
+      </div>
+      <div class="content">
+        <p>Result</p>
+        <code>
+          ${result}
+        </code>
+        </bc-authorizer-result>
+      </div>
+    `;
+  }
+
   render() {
     if (!this._started) return this.renderNotStarted();
 
-    const result = parse_token({ data: this.biscuit });
-    const blocks = result.token_blocks.map((code: string) => ({ code }));
+    const parseResult = parse_token({ data: this.biscuit });
+    const blocks = parseResult.token_blocks.map((code: string) => ({ code }));
+    const authorizerQuery = {
+      token_blocks: blocks.map((b: { code: string }) => b.code),
+      authorizer_code: this.authorizer,
+      query: "",
+    };
+    console.log({ authorizerQuery });
+    const authorizerResult = execute(authorizerQuery);
+    console.log({ authorizerResult });
+    const blockMarkers = authorizerResult.token_blocks.map(
+      (b: { markers: Array<LibMarker> }) => b.markers.map(this.convertMark)
+    );
 
-    return this.renderResult(result.error, blocks);
+    return html`
+      <div class="row">
+        ${this.renderResult(parseResult.error, blocks, blockMarkers)}
+      </div>
+      <div class="row">
+        ${this.renderAuthorizer(
+          authorizerResult.authorizer_editor.markers,
+          authorizerResult.authorizer_result
+        )}
+      </div>
+    `;
   }
 
   static styles = css`
-    :host {
+    .row {
       display: flex;
       flex-direction: column;
       text-align: left;
     }
 
     @media (prefers-color-scheme: dark) {
-      :host {
+      .row {
         color: #dee2e6;
         background: #131314;
       }
@@ -108,14 +204,14 @@ export class BcTokenPrinter extends LitElement {
     }
 
     @media (prefers-color-scheme: light) {
-      :host {
+      .row {
         color: #1d2d35;
         background: #fff;
       }
     }
 
     @media (min-width: 576px) {
-      :host {
+      .row {
         display: flex;
         flex-flow: row wrap;
         flex-direction: row;
