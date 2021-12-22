@@ -12,6 +12,9 @@ export class BcTokenPrinter extends LitElement {
   @property()
   biscuit = "";
 
+  @property()
+  readonly = false;
+
   @state()
   _started = false;
 
@@ -20,10 +23,19 @@ export class BcTokenPrinter extends LitElement {
   }
 
   _onUpdatedToken(e: InputEvent) {
+    if (this.readonly) return;
     this.biscuit = (e.target as HTMLInputElement).value.trim();
   }
 
   renderTokenInput() {
+    if (this.readonly) {
+      return html`
+        <div class="code">
+          <p>Encoded token</p>
+          <code>${this.biscuit}</code>
+        </div>
+      `;
+    }
     return html`
       <div class="code">
         <p>Encoded token</p>
