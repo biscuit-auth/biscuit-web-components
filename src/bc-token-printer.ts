@@ -68,7 +68,7 @@ export class BcTokenPrinter extends LitElement {
         ${blocks.map(
           (block, index) => html`
         <div>
-        <p>Block ${index}:</p>
+        <p>${index === 0 ? "Authority block" : `Block ${index}`}:</p>
         <bc-datalog-editor
           datalog=${block.code}
           readonly="true"
