@@ -28,8 +28,8 @@ export class BcTokenPrinter extends LitElement {
   constructor() {
     super();
     const authorizerChild = this.querySelector(".authorizer");
-    if(authorizerChild !== null) {
-        this.authorizer = authorizerChild.textContent!.trim();
+    if (authorizerChild !== null) {
+      this.authorizer = authorizerChild.textContent?.trim() ?? "";
     }
   }
 
