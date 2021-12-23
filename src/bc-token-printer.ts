@@ -174,7 +174,11 @@ export class BcTokenPrinter extends LitElement {
 
     return html`
       <div class="row">
-        ${this.renderResult(parseResult.error, blocks, blockMarkers)}
+        ${this.renderResult(
+          parseResult.error,
+          blocks,
+          this.showAuthorizer ? blockMarkers : []
+        )}
       </div>
       <div class="row">
         ${this.renderAuthorizer(
