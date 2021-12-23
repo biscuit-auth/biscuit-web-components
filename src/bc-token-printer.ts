@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import { execute, parse_token } from "@biscuit-auth/biscuit-wasm-support";
-import { LibMarker } from "./types.d";
+import { LibMarker } from "./types";
 
 /**
  * TODO DOCS
