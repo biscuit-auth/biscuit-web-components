@@ -165,9 +165,7 @@ export class BcTokenPrinter extends LitElement {
       authorizer_code: this.authorizer,
       query: "",
     };
-    console.log({ authorizerQuery });
     const authorizerResult = execute(authorizerQuery);
-    console.log({ authorizerResult });
     const blockMarkers = authorizerResult.token_blocks.map(
       (b: { markers: Array<LibMarker> }) => b.markers.map(this.convertMark)
     );
