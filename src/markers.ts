@@ -17,3 +17,16 @@ export type CMMarker = {
   end: number;
   ok: boolean;
 };
+
+export const convertMarker = (marker: LibMarker) => {
+  return {
+    from: {
+      line: marker.position.line_start,
+      ch: marker.position.column_start,
+    },
+    to: { line: marker.position.line_end, ch: marker.position.column_end },
+    start: marker.position.start,
+    end: marker.position.end,
+    ok: marker.ok,
+  };
+};

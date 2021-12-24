@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import { execute, parse_token } from "@biscuit-auth/biscuit-wasm-support";
-import { LibMarker } from "./types";
+import { LibMarker, convertMarker } from "./markers";
 
 /**
  * TODO DOCS
@@ -119,19 +119,6 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  convertMark(marker: LibMarker) {
-    return {
-      from: {
-        line: marker.position.line_start,
-        ch: marker.position.column_start,
-      },
-      to: { line: marker.position.line_end, ch: marker.position.column_end },
-      start: marker.position.start,
-      end: marker.position.end,
-      ok: marker.ok,
-    };
-  }
-
   renderAuthorizer(markers: Array<LibMarker>, result: string) {
     if (!this.showAuthorizer) return;
 
@@ -140,7 +127,7 @@ export class BcTokenPrinter extends LitElement {
         <p>Authorizer</p>
         <bc-authorizer-editor
           code="${this.authorizer}"
-          markers="${JSON.stringify(markers.map(this.convertMark))}"
+          markers="${JSON.stringify(markers.map(convertMarker))}"
           @bc-authorizer-editor:update=${this._onUpdatedAuthorizer}
         >
         </bc-authorizer-editor>
@@ -167,7 +154,7 @@ export class BcTokenPrinter extends LitElement {
     };
     const authorizerResult = execute(authorizerQuery);
     const blockMarkers = authorizerResult.token_blocks.map(
-      (b: { markers: Array<LibMarker> }) => b.markers.map(this.convertMark)
+      (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
     );
 
     return html`
