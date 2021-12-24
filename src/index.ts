@@ -7,6 +7,7 @@ import "./bc-authorizer-content.js";
 import "./bc-authorizer-example.js";
 import "./bc-datalog-example.js";
 import "./bc-token-printer";
+import "./bc-datalog-playground";
 import "./bc-full-example.js";
 export { execute } from "@biscuit-auth/biscuit-wasm-support";
 export { initialize } from "./wasm.js";
