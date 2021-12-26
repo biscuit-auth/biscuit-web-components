@@ -30,3 +30,18 @@ export const convertMarker = (marker: LibMarker) => {
     ok: marker.ok,
   };
 };
+
+export type LibError = {
+  message: string;
+  position: { start: number; end: number; line_start: number };
+};
+
+export const convertError = (error: LibError) => {
+  return {
+    message: error.message,
+    severity: "error",
+    line_start: error.position.line_start,
+    from: error.position.start,
+    to: error.position.end,
+  };
+};

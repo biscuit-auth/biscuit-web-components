@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import { execute } from "@biscuit-auth/biscuit-wasm-support";
-import { convertMarker } from "./markers";
+import { convertMarker, convertError } from "./markers";
 
 /**
  * TODO DOCS
@@ -32,6 +32,7 @@ export class BCDatalogPlayground extends LitElement {
   render() {
     let markers = [];
     let authorizer_world = [];
+    let parseErrors = [];
     if (this.started) {
       const authorizerQuery = {
         token_blocks: [],
@@ -41,12 +42,14 @@ export class BCDatalogPlayground extends LitElement {
       const authorizerResult = execute(authorizerQuery);
       authorizer_world = authorizerResult.authorizer_world;
       markers = authorizerResult.authorizer_editor.markers.map(convertMarker);
+      parseErrors = authorizerResult.authorizer_editor.errors.map(convertError);
     }
 
     return html`
       <bc-authorizer-editor
         code=${this.code}
         markers=${JSON.stringify(markers)}
+        parseErrors=${JSON.stringify(parseErrors)}
         @bc-authorizer-editor:update=${this.onUpdatedCode}
         }
       >
