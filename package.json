@@ -15,8 +15,8 @@
     "test": "wtr test/**/*.test.js --node-resolve",
     "test:watch": "wtr --watch test/**/*.test.js --node-resolve",
     "build": "tsc",
-    "prepublishOnly": "npm run ci && tsc && tsc -p tsconfig-cjs.json",
-    "ci": "tsc && eslint src --ext .ts && prettier -c src",
+    "prepublishOnly": "npm run build-lint && tsc && tsc -p tsconfig-cjs.json",
+    "build-lint": "tsc && eslint src --ext .ts && prettier -c src",
     "format": "prettier -w src"
   },
   "dependencies": {
