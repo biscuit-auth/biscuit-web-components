@@ -153,15 +153,24 @@ export class BcTokenPrinter extends LitElement {
       query: "",
     };
     const authorizerResult = execute(authorizerQuery);
-    const blockMarkers = (authorizerResult.Ok === undefined) ? [] :  authorizerResult.Ok.token_blocks.map(
-      (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
-    );
+    const blockMarkers =
+      authorizerResult.Ok === undefined
+        ? []
+        : authorizerResult.Ok.token_blocks.map(
+            (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
+          );
 
     console.log("result");
     console.log(authorizerResult.Ok.authorizer_result);
 
-    const authorizerMarkers = (authorizerResult.Ok === undefined) ? [] : authorizerResult.Ok.authorizer_editor.markers;
-    const authorizerResultString = (authorizerResult.Ok === undefined) ? authorizerResult.Err : authorizerResult.Ok;
+    const authorizerMarkers =
+      authorizerResult.Ok === undefined
+        ? []
+        : authorizerResult.Ok.authorizer_editor.markers;
+    const authorizerResultString =
+      authorizerResult.Ok === undefined
+        ? authorizerResult.Err
+        : authorizerResult.Ok;
 
     return html`
       <div class="row">
@@ -172,10 +181,7 @@ export class BcTokenPrinter extends LitElement {
         )}
       </div>
       <div class="row">
-        ${this.renderAuthorizer(
-          authorizerMarkers,
-          authorizerResultString
-        )}
+        ${this.renderAuthorizer(authorizerMarkers, authorizerResultString)}
       </div>
     `;
   }
