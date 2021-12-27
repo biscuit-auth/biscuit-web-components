@@ -141,6 +141,8 @@ export class BcFullExample extends LitElement {
       }
     }
 
+    authorizer_world = result.Ok?.authorizer_world ?? [];
+
     return html`
       <div class="blocks">
         <p>Token</p>
@@ -181,7 +183,7 @@ export class BcFullExample extends LitElement {
         <details>
           <summary>Facts</summary>
           <bc-authorizer-content
-            content="${JSON.stringify(result.authorizer_world)}"
+            content="${JSON.stringify(authorizer_world)}"
           ></bc-authorizer-content>
         </details>
       </div>

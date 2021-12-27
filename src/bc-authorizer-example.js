@@ -63,8 +63,56 @@ export class BcAuthorizerExample extends LitElement {
       };
       var result = execute(state);
 
+      if (result.Ok === undefined) {
+        for (let b of result.Err.blocks) {
+          var errors = [];
+          var marks = [];
+          for (let error of b) {
+            errors.push({
+              message: error.message,
+              severity: "error",
+              from: error.position.start,
+              to: error.position.end,
+            });
+          }
+          blockParseErrors.push(errors);
+        }
+
+        for (let error of result.Err.authorizer) {
+          parseErrors.push({
+            message: error.message,
+            severity: "error",
+            start: error.position.start,
+            end: error.position.end,
+          });
+        }
+      } else {
+        for (let b of result.Ok.token_blocks) {
+          var marks = [];
+
+          for (let marker of b.markers) {
+            marks.push({
+              start: marker.position.start,
+              end: marker.position.end,
+              ok: marker.ok,
+            });
+          }
+
+          blockMarkers.push(marks);
+        }
+
+        for (let marker of result.Ok.authorizer_editor.markers) {
+          console.log(marker);
+          markers.push({
+            start: marker.position.start,
+            end: marker.position.end,
+            ok: marker.ok,
+          });
+        }
+      }
+
       authorizer_result = result.authorizer_result;
-      authorizer_world = result.authorizer_world;
+      authorizer_world = result.Ok?.authorizer_world ?? [];
 
       if (result.authorizer_editor != null) {
         for (let error of result.authorizer_editor.errors) {
