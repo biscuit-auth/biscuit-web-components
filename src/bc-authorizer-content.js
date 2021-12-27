@@ -16,10 +16,18 @@ export class BcAuthorizerContent extends LitElement {
   }
 
   render() {
+    const sortedFacts = [...this.content].sort((f1, f2) => {
+      if (f1.name == f2.name) {
+        return f1.terms > f2.terms;
+      } else {
+        return f1.name > f2.name;
+      }
+    });
+
     var facts_map = {};
     var facts = "";
     var current_name;
-    for (let fact of this.content) {
+    for (let fact of sortedFacts) {
       if (facts_map[fact.name] == undefined) {
         facts_map[fact.name] = [];
       }
@@ -36,8 +44,6 @@ export class BcAuthorizerContent extends LitElement {
 
       facts += fact.name + "(" + fact.terms + ");\n";
     }
-
-    console.log(facts);
 
     return html` <div>
       <bc-datalog-editor datalog=${facts} readonly="true"></bc-datalog-editor>
