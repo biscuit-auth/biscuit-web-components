@@ -92,11 +92,25 @@ export class BcFullExample extends LitElement {
     var blockParseErrors = [];
     var blockMarkers = [];
 
-    for (let b of result.token_blocks) {
-      var errors = [];
-      var marks = [];
-      for (let error of b.errors) {
-        errors.push({
+    // handle parse errors
+    if (result.Ok === undefined) {
+      for (let b of result.Err.blocks) {
+        var errors = [];
+        var marks = [];
+        for (let error of b) {
+          errors.push({
+            message: error.message,
+            severity: "error",
+            line_start: error.position.line_start,
+            from: error.position.start,
+            to: error.position.end,
+          });
+        }
+        blockParseErrors.push(errors);
+      }
+
+      for (let error of result.Err.authorizer) {
+        parseErrors.push({
           message: error.message,
           severity: "error",
           line_start: error.position.line_start,
@@ -104,9 +118,33 @@ export class BcFullExample extends LitElement {
           to: error.position.end,
         });
       }
+    } else {
 
-      for (let marker of b.markers) {
-        marks.push({
+      for (let b of result.Ok.token_blocks) {
+        var marks = [];
+
+        for (let marker of b.markers) {
+          marks.push({
+            from: {
+              line: marker.position.line_start,
+              ch: marker.position.column_start,
+            },
+            to: {
+              line: marker.position.line_end,
+              ch: marker.position.column_end,
+            },
+            start: marker.position.start,
+            end: marker.position.end,
+            ok: marker.ok,
+          });
+        }
+
+        blockMarkers.push(marks);
+      }
+
+      for (let marker of result.Ok.authorizer_editor.markers) {
+        console.log(marker);
+        markers.push({
           from: {
             line: marker.position.line_start,
             ch: marker.position.column_start,
@@ -120,37 +158,8 @@ export class BcFullExample extends LitElement {
           ok: marker.ok,
         });
       }
-
-      blockParseErrors.push(errors);
-      blockMarkers.push(marks);
     }
 
-    for (let error of result.authorizer_editor.errors) {
-      parseErrors.push({
-        message: error.message,
-        severity: "error",
-        line_start: error.position.line_start,
-        from: error.position.start,
-        to: error.position.end,
-      });
-    }
-
-    for (let marker of result.authorizer_editor.markers) {
-      console.log(marker);
-      markers.push({
-        from: {
-          line: marker.position.line_start,
-          ch: marker.position.column_start,
-        },
-        to: {
-          line: marker.position.line_end,
-          ch: marker.position.column_end,
-        },
-        start: marker.position.start,
-        end: marker.position.end,
-        ok: marker.ok,
-      });
-    }
 
     return html`
       <div class="blocks">
