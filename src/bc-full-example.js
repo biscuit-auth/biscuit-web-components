@@ -101,7 +101,6 @@ export class BcFullExample extends LitElement {
           errors.push({
             message: error.message,
             severity: "error",
-            line_start: error.position.line_start,
             from: error.position.start,
             to: error.position.end,
           });
@@ -113,26 +112,16 @@ export class BcFullExample extends LitElement {
         parseErrors.push({
           message: error.message,
           severity: "error",
-          line_start: error.position.line_start,
-          from: error.position.start,
-          to: error.position.end,
+          start: error.position.start,
+          end: error.position.end,
         });
       }
     } else {
-
       for (let b of result.Ok.token_blocks) {
         var marks = [];
 
         for (let marker of b.markers) {
           marks.push({
-            from: {
-              line: marker.position.line_start,
-              ch: marker.position.column_start,
-            },
-            to: {
-              line: marker.position.line_end,
-              ch: marker.position.column_end,
-            },
             start: marker.position.start,
             end: marker.position.end,
             ok: marker.ok,
@@ -145,21 +134,12 @@ export class BcFullExample extends LitElement {
       for (let marker of result.Ok.authorizer_editor.markers) {
         console.log(marker);
         markers.push({
-          from: {
-            line: marker.position.line_start,
-            ch: marker.position.column_start,
-          },
-          to: {
-            line: marker.position.line_end,
-            ch: marker.position.column_end,
-          },
           start: marker.position.start,
           end: marker.position.end,
           ok: marker.ok,
         });
       }
     }
-
 
     return html`
       <div class="blocks">

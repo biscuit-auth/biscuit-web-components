@@ -70,8 +70,8 @@ export class BcDatalogExample extends LitElement {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            from: error.position.start, //CodeMirror.Pos(error.position.line_start, error.position.column_start),
-            to: error.position.end, //CodeMirror.Pos(error.position.line_end, error.position.column_end),
+            from: error.position.start,
+            to: error.position.end,
           });
         }
 
@@ -79,14 +79,6 @@ export class BcDatalogExample extends LitElement {
           // do not display the marker for the additional "allow if true"
           if (marker.position.start != this.code.length + 2) {
             markers.push({
-              from: {
-                line: marker.position.line_start,
-                ch: marker.position.column_start,
-              },
-              to: {
-                line: marker.position.line_end,
-                ch: marker.position.column_end,
-              },
               start: marker.position.start,
               end: marker.position.end,
               ok: marker.ok,

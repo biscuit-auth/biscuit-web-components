@@ -71,23 +71,14 @@ export class BcAuthorizerExample extends LitElement {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            line_start: error.position.line_start,
-            from: error.position.start, //CodeMirror.Pos(error.position.line_start, error.position.column_start),
-            to: error.position.end, //CodeMirror.Pos(error.position.line_end, error.position.column_end),
+            from: error.position.start,
+            to: error.position.end,
           });
         }
 
         for (let marker of result.authorizer_editor.markers) {
           console.log(marker);
           markers.push({
-            from: {
-              line: marker.position.line_start,
-              ch: marker.position.column_start,
-            },
-            to: {
-              line: marker.position.line_end,
-              ch: marker.position.column_end,
-            },
             start: marker.position.start,
             end: marker.position.end,
             ok: marker.ok,
