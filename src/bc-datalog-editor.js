@@ -223,7 +223,7 @@ export class BcDatalogEditor extends LitElement {
     resetAllMarks(this._cm);
     if (changedProperties.has("parseErrors")) {
       for (let error of this.parseErrors) {
-        setParseErrorMark(this._cm, error.from, error.to);
+        setParseErrorMark(this._cm, error.start, error.end);
       }
     }
 

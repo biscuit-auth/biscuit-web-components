@@ -70,8 +70,8 @@ export class BcDatalogExample extends LitElement {
           parseErrors.push({
             message: error.message,
             severity: "error",
-            from: error.position.start,
-            to: error.position.end,
+            start: error.position.start,
+            end: error.position.end,
           });
         }
 

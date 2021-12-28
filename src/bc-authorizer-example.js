@@ -71,8 +71,8 @@ export class BcAuthorizerExample extends LitElement {
             errors.push({
               message: error.message,
               severity: "error",
-              from: error.position.start,
-              to: error.position.end,
+              start: error.position.start,
+              end: error.position.end,
             });
           }
           blockParseErrors.push(errors);
