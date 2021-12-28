@@ -40,9 +40,10 @@ export class BCDatalogPlayground extends LitElement {
         query: "",
       };
       const authorizerResult = execute(authorizerQuery);
-      authorizer_world = authorizerResult.authorizer_world;
-      markers = authorizerResult.authorizer_editor.markers.map(convertMarker);
-      parseErrors = authorizerResult.authorizer_editor.errors.map(convertError);
+      authorizer_world = authorizerResult.Ok?.authorizer_world ?? [];
+      markers =
+        authorizerResult.Ok?.authorizer_editor.markers.map(convertMarker) ?? [];
+      parseErrors = authorizerResult.Err?.authorizer.map(convertError) ?? [];
     }
 
     return html`
