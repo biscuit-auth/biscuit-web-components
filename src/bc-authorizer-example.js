@@ -111,8 +111,8 @@ export class BcAuthorizerExample extends LitElement {
         }
       }
 
-      authorizer_result = result.authorizer_result;
       authorizer_world = result.Ok?.authorizer_world ?? [];
+      authorizer_result = result.Ok?.authorizer_result ?? null;
 
       if (result.authorizer_editor != null) {
         for (let error of result.authorizer_editor.errors) {
