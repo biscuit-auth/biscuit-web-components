@@ -15,7 +15,8 @@ export class BcAuthorizerResult extends LitElement {
   }
 
   render() {
-    const content = this.content == null ? "no content yet" : this.content;
+    const content =
+      this.content == null ? "no content yet" : JSON.stringify(this.content);
     return html` <div><pre>${content}</pre></div> `;
   }
 

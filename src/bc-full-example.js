@@ -92,65 +92,57 @@ export class BcFullExample extends LitElement {
     var blockParseErrors = [];
     var blockMarkers = [];
 
-    for (let b of result.token_blocks) {
-      var errors = [];
-      var marks = [];
-      for (let error of b.errors) {
-        errors.push({
-          message: error.message,
-          severity: "error",
-          line_start: error.position.line_start,
-          from: error.position.start,
-          to: error.position.end,
-        });
+    // handle parse errors
+    if (result.Ok === undefined) {
+      for (let b of result.Err.blocks) {
+        var errors = [];
+        var marks = [];
+        for (let error of b) {
+          errors.push({
+            message: error.message,
+            severity: "error",
+            start: error.position.start,
+            end: error.position.end,
+          });
+        }
+        blockParseErrors.push(errors);
       }
 
-      for (let marker of b.markers) {
-        marks.push({
-          from: {
-            line: marker.position.line_start,
-            ch: marker.position.column_start,
-          },
-          to: {
-            line: marker.position.line_end,
-            ch: marker.position.column_end,
-          },
+      for (let error of result.Err.authorizer) {
+        parseErrors.push({
+          message: error.message,
+          severity: "error",
+          start: error.position.start,
+          end: error.position.end,
+        });
+      }
+    } else {
+      for (let b of result.Ok.token_blocks) {
+        var marks = [];
+
+        for (let marker of b.markers) {
+          marks.push({
+            start: marker.position.start,
+            end: marker.position.end,
+            ok: marker.ok,
+          });
+        }
+
+        blockMarkers.push(marks);
+      }
+
+      for (let marker of result.Ok.authorizer_editor.markers) {
+        console.log(marker);
+        markers.push({
           start: marker.position.start,
           end: marker.position.end,
           ok: marker.ok,
         });
       }
-
-      blockParseErrors.push(errors);
-      blockMarkers.push(marks);
     }
 
-    for (let error of result.authorizer_editor.errors) {
-      parseErrors.push({
-        message: error.message,
-        severity: "error",
-        line_start: error.position.line_start,
-        from: error.position.start,
-        to: error.position.end,
-      });
-    }
-
-    for (let marker of result.authorizer_editor.markers) {
-      console.log(marker);
-      markers.push({
-        from: {
-          line: marker.position.line_start,
-          ch: marker.position.column_start,
-        },
-        to: {
-          line: marker.position.line_end,
-          ch: marker.position.column_end,
-        },
-        start: marker.position.start,
-        end: marker.position.end,
-        ok: marker.ok,
-      });
-    }
+    authorizer_world = result.Ok?.authorizer_world ?? [];
+    authorizer_result = result.Ok?.authorizer_result ?? null;
 
     return html`
       <div class="blocks">
@@ -187,12 +179,12 @@ export class BcFullExample extends LitElement {
 
         <em>Execution result</em>
         <bc-authorizer-result
-          content="${JSON.stringify(result.authorizer_result)}"
+          content="${JSON.stringify(authorizer_result)}"
         ></bc-authorizer-result>
         <details>
           <summary>Facts</summary>
           <bc-authorizer-content
-            content="${JSON.stringify(result.authorizer_world)}"
+            content="${JSON.stringify(authorizer_world)}"
           ></bc-authorizer-content>
         </details>
       </div>
