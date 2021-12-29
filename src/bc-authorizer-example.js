@@ -3,7 +3,7 @@ import { customElement, property } from "lit/decorators.js";
 import { dispatchCustomEvent } from "../src/lib/events.js";
 import { execute } from "@biscuit-auth/biscuit-wasm-support";
 import "./bc-authorizer-editor.js";
-import "./bc-authorizer-result.js";
+import "./bc-authorizer-result";
 import "./bc-authorizer-content.js";
 import { initialize } from "./wasm.js";
 
@@ -147,9 +147,7 @@ export class BcAuthorizerExample extends LitElement {
       >
       </bc-authorizer-editor>
       <em>Execution result</em>
-      <bc-authorizer-result
-        content="${JSON.stringify(authorizer_result)}"
-      ></bc-authorizer-result>
+      <bc-authorizer-result .content=${result}></bc-authorizer-result>
       <details>
         <summary>Facts</summary>
         <bc-authorizer-content
