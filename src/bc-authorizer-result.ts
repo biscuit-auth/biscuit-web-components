@@ -16,15 +16,20 @@ export class BcAuthorizerResult extends LitElement {
   content?: Result<AuthorizerResult, AuthorizerError>;
 
   renderLogicError(e: LogicError) {
-    const failedChecksCount = e.FailedChecks?.length ?? 0;
-
-    if (e === "NoMatchingPolicy") {
-      return html` <div><pre>No policy matched</pre></div> `;
-    } else if (e.Deny !== undefined) {
-      return html` <div><pre>A deny policy matched</pre></div> `;
-    } else {
-      return html` <div><pre>${failedChecksCount} failed checks</pre></div> `;
+    const failedChecksCount =
+      e.Unauthorized?.checks.length ?? e.NoMatchingPolicy?.checks.length ?? 0;
+    const failedChecks =
+      failedChecksCount > 0
+        ? html`<pre>${failedChecksCount} failed checks</pre>`
+        : null;
+    let policyError;
+    if (e.NoMatchingPolicy) {
+      policyError = html`<pre>No policy matched</pre>`;
+    } else if (e.Unauthorized && e.Unauthorized.policy.Deny !== undefined) {
+      policyError = html`<pre>A deny policy matched</pre>`;
     }
+
+    return html`<div>${failedChecks} ${policyError}</div>`;
   }
 
   renderResult() {
