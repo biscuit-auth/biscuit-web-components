@@ -49,15 +49,22 @@ export type Fact = {
   terms: Array<string>;
 };
 
+export type Check = {
+  Block: {
+    block_id: number;
+    check_id: number;
+    rule: string;
+  };
+};
+
 export type LogicError = {
-  Deny?: number;
-  FailedChecks?: Array<{
-    Block: {
-      block_id: number;
-      check_id: number;
-      rule: string;
-    };
-  }>;
+  Unauthorized?: {
+    checks: Array<Check>;
+    policy: { Allow?: number; Deny?: number };
+  };
+  NoMatchingPolicy?: {
+    checks: Array<Check>;
+  };
 };
 
 export type AuthorizerResult = {
