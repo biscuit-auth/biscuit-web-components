@@ -6,16 +6,18 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>demo biscuit</title>
   <link rel="stylesheet" href="/demo/index.css">
-  <script type="module" src="/demo/index.js"></script>
+  <script type="module" src="/src/index.ts"></script>
 </head>
 <body>
 <h1>demo biscuit</h1>
 
-<ul>
-  <li><a href="full.html">Token + authorizer</a></li>
-  <li><a href="token.html">Token printer</a></li>
-  <li><a href="authorizer.html">Authorizer editor</a></li>
-  <li><a href="playground.html">Datalog playground</a></li>
-</ul>
+<bc-datalog-playground>
+    <code>
+operation("read");
+resource("file1");
+allow if false;
+        </code>
+        </bc-token-printer>
+
 </body>
 </html>

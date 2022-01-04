@@ -3,7 +3,14 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import { execute, parse_token } from "@biscuit-auth/biscuit-wasm-support";
-import { LibMarker, convertMarker } from "./markers";
+import {
+  LibMarker,
+  Result,
+  AuthorizerResult,
+  AuthorizerError,
+  convertMarker,
+  convertError,
+} from "./lib/adapters";
 
 /**
  * TODO DOCS
@@ -109,7 +116,7 @@ export class BcTokenPrinter extends LitElement {
         <p>${index === 0 ? "Authority block" : `Block ${index}`}:</p>
         <bc-datalog-editor
           datalog=${block.code}
-          markers="${JSON.stringify(blockMarkers[index])}"
+          .markers=${blockMarkers[index] ?? []}
           readonly="true"
         </bc-datalog-editor>
         </div>
@@ -119,25 +126,26 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
-  renderAuthorizer(markers: Array<LibMarker>, result: string) {
+  renderAuthorizer(result: Result<AuthorizerResult, AuthorizerError>) {
     if (!this.showAuthorizer) return;
+
+    const markers = result.Ok?.authorizer_editor.markers ?? [];
+    const errors = result.Err?.authorizer ?? [];
 
     return html`
       <div class="code">
         <p>Authorizer</p>
         <bc-authorizer-editor
           code="${this.authorizer}"
-          markers="${JSON.stringify(markers.map(convertMarker))}"
+          .markers=${markers.map(convertMarker)}
+          .parseErrors=${errors.map(convertError)}
           @bc-authorizer-editor:update=${this._onUpdatedAuthorizer}
         >
         </bc-authorizer-editor>
       </div>
       <div class="content">
         <p>Result</p>
-        <code>
-          ${result}
-        </code>
-        </bc-authorizer-result>
+        <bc-authorizer-result .content=${result}> </bc-authorizer-result>
       </div>
     `;
   }
@@ -154,23 +162,9 @@ export class BcTokenPrinter extends LitElement {
     };
     const authorizerResult = execute(authorizerQuery);
     const blockMarkers =
-      authorizerResult.Ok === undefined
-        ? []
-        : authorizerResult.Ok.token_blocks.map(
-            (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
-          );
-
-    console.log("result");
-    console.log(authorizerResult.Ok.authorizer_result);
-
-    const authorizerMarkers =
-      authorizerResult.Ok === undefined
-        ? []
-        : authorizerResult.Ok.authorizer_editor.markers;
-    const authorizerResultString =
-      authorizerResult.Ok === undefined
-        ? authorizerResult.Err
-        : authorizerResult.Ok;
+      authorizerResult.Ok?.token_blocks.map(
+        (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
+      ) ?? [];
 
     return html`
       <div class="row">
@@ -180,9 +174,7 @@ export class BcTokenPrinter extends LitElement {
           this.showAuthorizer ? blockMarkers : []
         )}
       </div>
-      <div class="row">
-        ${this.renderAuthorizer(authorizerMarkers, authorizerResultString)}
-      </div>
+      <div class="row">${this.renderAuthorizer(authorizerResult)}</div>
     `;
   }
 
