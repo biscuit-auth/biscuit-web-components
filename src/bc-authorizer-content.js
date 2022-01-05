@@ -18,9 +18,9 @@ export class BcAuthorizerContent extends LitElement {
   render() {
     const sortedFacts = [...this.content].sort((f1, f2) => {
       if (f1.name == f2.name) {
-        return f1.terms > f2.terms;
+        return f1.terms > f2.terms ? 1 : -1;
       } else {
-        return f1.name > f2.name;
+        return f1.name > f2.name ? 1 : -1;
       }
     });
 
