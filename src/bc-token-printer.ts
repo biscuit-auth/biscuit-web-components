@@ -89,7 +89,7 @@ export class BcTokenPrinter extends LitElement {
 
   renderResult(
     error: string,
-    blocks: Array<{ code: string }>,
+    blocks: Array<{ code: string; revocation_id: string }>,
     blockMarkers: Array<LibMarker>
   ) {
     if (this.biscuit === "") {
@@ -114,6 +114,9 @@ export class BcTokenPrinter extends LitElement {
           (block, index) => html`
         <div>
         <p>${index === 0 ? "Authority block" : `Block ${index}`}:</p>
+        <p class="revocation-id">Revocation id: <span class="id">${
+          block.revocation_id
+        }</span></p>
         <bc-datalog-editor
           datalog=${block.code}
           .markers=${blockMarkers[index] ?? []}
@@ -154,7 +157,10 @@ export class BcTokenPrinter extends LitElement {
     if (!this._started) return this.renderNotStarted();
 
     const parseResult = parse_token({ data: this.biscuit });
-    const blocks = parseResult.token_blocks.map((code: string) => ({ code }));
+    const blocks = parseResult.token_blocks.map((code: string, i: number) => ({
+      code,
+      revocation_id: parseResult.revocation_ids[i],
+    }));
     const authorizerQuery = {
       token_blocks: blocks.map((b: { code: string }) => b.code),
       authorizer_code: this.authorizer,
@@ -249,6 +255,17 @@ export class BcTokenPrinter extends LitElement {
       margin-block-end: 0px;
       padding: 0.2em;
       font-size: 0.8em;
+    }
+
+    .revocation-id {
+      overflow: hidden;
+      diplay: inline-block;
+      text-overflow: ellipsis;
+      max-width: 100;
+    }
+
+    .revocation-id > .id {
+      user-select: all;
     }
 
     bc-datalog-editor {
