@@ -11,13 +11,18 @@
 <body>
 <h1>demo biscuit</h1>
 
+<style>
+  bc-datalog-playground {
+    --editor-font: 20px;
+  }
+</style>
 <bc-datalog-playground>
-    <code>
+  <code>
 operation("read");
 resource("file1");
 allow if false;
-        </code>
-        </bc-token-printer>
+  </code>
+</bc-datalog-playground>
 
 </body>
 </html>

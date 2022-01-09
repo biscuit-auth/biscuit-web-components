@@ -252,6 +252,7 @@ export class BcDatalogEditor extends LitElement {
       css`
         :host {
           display: block;
+          font-size: var(--editor-font, 13px);
         }
 
         @media (prefers-color-scheme: dark) {
