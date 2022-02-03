@@ -80,3 +80,10 @@ export type AuthorizerResult = {
   authorizer_world: Array<Fact>;
   token_blocks: Array<{ markers: Array<LibMarker> }>;
 };
+
+export type GeneratorError = {
+  Biscuit?: "InternalError" | { Format?: { InvalidKeySize?: number } };
+  Parse?: {
+    blocks: Array<Array<LibError>>;
+  };
+};
