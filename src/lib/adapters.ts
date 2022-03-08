@@ -87,3 +87,10 @@ export type GeneratorError = {
     blocks: Array<Array<LibError>>;
   };
 };
+
+export type AttenuactionError = {
+  Biscuit?: { Format?: { InvalidKeySize?: number } };
+  BlockParseErrors?: {
+    blocks: Array<Array<LibError>>;
+  };
+};

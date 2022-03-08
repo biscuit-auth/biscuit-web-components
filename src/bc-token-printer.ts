@@ -2,12 +2,17 @@ import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
-import { execute, parse_token } from "@biscuit-auth/biscuit-wasm-support";
 import {
+  execute,
+  parse_token,
+  attenuate_token,
+} from "@biscuit-auth/biscuit-wasm-support";
+import {
+  AuthorizerError,
+  AuthorizerResult,
+  LibError,
   LibMarker,
   Result,
-  AuthorizerResult,
-  AuthorizerError,
   convertMarker,
   convertError,
 } from "./lib/adapters";
@@ -28,6 +33,12 @@ export class BcTokenPrinter extends LitElement {
 
   @property()
   authorizer = "";
+
+  @property()
+  showAttenuation = false;
+
+  @state()
+  extraBlocks: Array<string> = [];
 
   @state()
   _started = false;
@@ -52,6 +63,18 @@ export class BcTokenPrinter extends LitElement {
   _onUpdatedAuthorizer(e: { detail: { code: string } }) {
     if (!this.showAuthorizer) return;
     this.authorizer = e.detail.code;
+  }
+
+  _onUpdatedExtraBlock(blockId: number, e: { detail: { code: string } }) {
+    const newBlocks = [...this.extraBlocks];
+    newBlocks[blockId] = e.detail.code;
+    this.extraBlocks = newBlocks;
+  }
+
+  _addExtraBlock() {
+    const newBlocks = [...this.extraBlocks].filter((b) => b !== "");
+    newBlocks.push("");
+    this.extraBlocks = newBlocks;
   }
 
   renderTokenInput() {
@@ -153,6 +176,69 @@ export class BcTokenPrinter extends LitElement {
     `;
   }
 
+  renderExtraBlock(
+    blockId: number,
+    errors: Array<LibError> = [],
+    blocksOffset: number
+  ) {
+    return html`
+      <p>${"Block " + (blocksOffset + blockId)}:</p>
+      <bc-datalog-editor
+        code="${this.extraBlocks[blockId] ?? ""}"
+        .parseErrors=${errors.map(convertError)}
+        @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
+          this._onUpdatedExtraBlock(blockId, e)}
+      >
+      </bc-datalog-editor>
+    `;
+  }
+
+  renderAttenuation(blocksOffset: number) {
+    if (!this.showAttenuation) return;
+
+    const result = attenuate_token({
+      token: this.biscuit,
+      blocks: this.extraBlocks.filter((b) => b !== ""),
+    });
+
+    const blocksWithErrors: Array<number> = [];
+    (result.Err?.BlockParseErrors?.blocks ?? []).forEach(
+      (errors: Array<LibError>, bId: number) => {
+        if (errors.length > 0) {
+          blocksWithErrors.push(bId);
+        }
+      }
+    );
+
+    let errorMessage = "An error has happened";
+
+    if (blocksWithErrors.length > 0) {
+      const blockList = blocksWithErrors
+        .map((bId) => (bId + blocksOffset).toString())
+        .join(", ");
+      errorMessage =
+        "Please correct the datalog input on the following blocks: " +
+        blockList;
+    }
+
+    const attenuated = result.Ok ?? errorMessage;
+
+    return html`
+      <div class="code">
+        <p>Extra blocks</p>
+        ${this.extraBlocks.map((code, id) => {
+          const blockErrors = result.Err?.BlockParseErrors?.blocks[id] ?? [];
+          return this.renderExtraBlock(id, blockErrors, blocksOffset);
+        })}
+        <button @click=${this._addExtraBlock}>Add block</button>
+      </div>
+      <div class="content">
+        <p>Attenuated token</p>
+        <code>${attenuated}</code>
+      </div>
+    `;
+  }
+
   render() {
     if (!this._started) return this.renderNotStarted();
 
@@ -172,6 +258,9 @@ export class BcTokenPrinter extends LitElement {
         (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
       ) ?? [];
 
+    // Extra blocks numbers are offset by the amount of blocks already in the token
+    const blocksOffset = blocks.length;
+
     return html`
       <div class="row">
         ${this.renderResult(
@@ -181,6 +270,7 @@ export class BcTokenPrinter extends LitElement {
         )}
       </div>
       <div class="row">${this.renderAuthorizer(authorizerResult)}</div>
+      <div class="row">${this.renderAttenuation(blocksOffset)}</div>
     `;
   }
 
@@ -265,6 +355,10 @@ export class BcTokenPrinter extends LitElement {
     }
 
     .revocation-id > .id {
+      user-select: all;
+    }
+
+    .content code {
       user-select: all;
     }
 
