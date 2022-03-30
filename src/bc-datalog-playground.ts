@@ -3,7 +3,14 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import { execute } from "@biscuit-auth/biscuit-wasm-support";
-import { convertMarker, convertError } from "./lib/adapters";
+import {
+  convertMarker,
+  convertError,
+  LibMarker,
+  CMError,
+  CMMarker,
+  LibError,
+} from "./lib/adapters";
 
 /**
  * TODO DOCS
@@ -11,18 +18,37 @@ import { convertMarker, convertError } from "./lib/adapters";
 @customElement("bc-datalog-playground")
 export class BCDatalogPlayground extends LitElement {
   @property() code = "";
+  @property() showBlocks = false;
+  @state() blocks: Array<string> = [];
   @state() private started = false;
 
   constructor() {
     super();
-    const codeChild = this.querySelector("code");
+
+    const codeChild = this.querySelector("code.authorizer");
     if (codeChild !== null) {
       this.code = codeChild.textContent?.trim() ?? "";
     }
+    const blockChildren = this.querySelectorAll("code.block");
+    this.blocks = Array.from(blockChildren)
+      .map((b) => b.textContent?.trim() ?? "")
+      .filter((x) => x !== "");
   }
 
   firstUpdated() {
     initialize().then(() => (this.started = true));
+  }
+
+  addBlock() {
+    const newBlocks = [...this.blocks];
+    newBlocks.push("");
+    this.blocks = newBlocks;
+  }
+
+  onUpdatedBlock(blockId: number, e: { detail: { code: string } }) {
+    const newBlocks = [...this.blocks];
+    newBlocks[blockId] = e.detail.code;
+    this.blocks = newBlocks;
   }
 
   onUpdatedCode(e: { detail: { code: string } }) {
@@ -30,35 +56,93 @@ export class BCDatalogPlayground extends LitElement {
   }
 
   render() {
-    let markers = [];
     let authorizer_world = [];
-    let parseErrors = [];
+    let authorizer_result = null;
+    const parseErrors = {
+      blocks: [],
+      authorizer: [],
+    };
+    const markers = {
+      blocks: [],
+      authorizer: [],
+    };
     if (this.started) {
       const authorizerQuery = {
-        token_blocks: [],
+        token_blocks: this.blocks.filter((x) => x !== ""),
         authorizer_code: this.code,
         query: "",
       };
       const authorizerResult = execute(authorizerQuery);
+      console.warn({ authorizerQuery, authorizerResult });
       authorizer_world = authorizerResult.Ok?.authorizer_world ?? [];
-      markers =
+      authorizer_result = authorizerResult;
+      markers.authorizer =
         authorizerResult.Ok?.authorizer_editor.markers.map(convertMarker) ?? [];
-      parseErrors = authorizerResult.Err?.authorizer.map(convertError) ?? [];
+      parseErrors.authorizer =
+        authorizerResult.Err?.authorizer.map(convertError) ?? [];
+
+      markers.blocks =
+        authorizerResult.Ok?.token_blocks.map(
+          (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
+        ) ?? [];
+      parseErrors.blocks =
+        authorizerResult.Err?.blocks.map((b: Array<LibError>) =>
+          b.map(convertError)
+        ) ?? [];
     }
 
     return html`
+      ${this.renderBlocks(markers.blocks, parseErrors.blocks)}
+      ${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}
+      <p>Result</p>
+      <bc-authorizer-result .content=${authorizer_result}>
+      </bc-authorizer-result>
+      <p>Facts</p>
+      <bc-authorizer-content
+        .content=${authorizer_world}
+      ></bc-authorizer-content>
+    `;
+  }
+
+  renderBlock(
+    blockId: number,
+    code: string,
+    markers: Array<CMMarker>,
+    errors: Array<CMError>
+  ) {
+    return html`
+        <p>${blockId == 0 ? "Authority block" : "Block " + blockId}:</p>
+      <bc-datalog-editor
+        datalog=${code}
+        .markers=${markers ?? []}
+        .parseErrors=${errors ?? []}
+        @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
+          this.onUpdatedBlock(blockId, e)}
+        }
+      >
+      </bc-authorizer-editor>`;
+  }
+
+  renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
+    if (!this.showBlocks) return;
+
+    return html`
+      ${this.blocks.map((code, id) => {
+        return this.renderBlock(id, code, markers[id], errors[id]);
+      })}
+      <button @click=${this.addBlock}>Add block</button>
+    `;
+  }
+
+  renderAuthorizer(markers: Array<CMMarker>, parseErrors: Array<CMError>) {
+    return html` <p>Authorizer</p>
       <bc-authorizer-editor
         code=${this.code}
-        markers=${JSON.stringify(markers)}
-        parseErrors=${JSON.stringify(parseErrors)}
+        .markers=${markers ?? []}
+        .parseErrors=${parseErrors ?? []}
         @bc-authorizer-editor:update=${this.onUpdatedCode}
         }
       >
-      </bc-authorizer-editor>
-      Facts:
-      <bc-authorizer-content
-        content="${JSON.stringify(authorizer_world)}"
-      ></bc-authorizer-content>
-    `;
+      </bc-authorizer-editor>`;
   }
 }

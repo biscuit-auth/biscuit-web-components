@@ -16,10 +16,12 @@
     --editor-font: 20px;
   }
 </style>
-<bc-datalog-playground>
-  <code>
+<bc-datalog-playground showBlocks="true">
+  <code class="block">
 operation("read");
 resource("file1");
+  </code>
+  <code class="authorizer">
 allow if false;
   </code>
 </bc-datalog-playground>
