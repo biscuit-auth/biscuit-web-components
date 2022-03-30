@@ -25,6 +25,13 @@ export type LibError = {
   position: { start: number; end: number };
 };
 
+export type CMError = {
+  message: string;
+  severity: string;
+  start: number;
+  end: number;
+};
+
 export const convertError = (error: LibError) => {
   return {
     message: error.message,
