@@ -8,7 +8,7 @@
     "dist/"
   ],
   "author": "Geoffroy Couprie",
-  "version": "0.3.14",
+  "version": "0.4.0-alpha1",
   "scripts": {
     "start": "wds --node-resolve --open demo/",
     "serve": "wds --node-resolve --open demo/ --watch",
@@ -20,7 +20,7 @@
     "format": "prettier -w src"
   },
   "dependencies": {
-    "@biscuit-auth/biscuit-wasm-support": "^0.3.7",
+    "@biscuit-auth/biscuit-wasm-support": "^0.4.0-alpha1",
     "@codemirror/basic-setup": "^0.19.0",
     "@codemirror/gutter": "^0.19.5",
     "@codemirror/highlight": "^0.19.6",
