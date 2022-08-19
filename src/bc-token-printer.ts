@@ -34,7 +34,7 @@ export class BcTokenPrinter extends LitElement {
   @property()
   authorizer = "";
 
-  @state()
+  @property()
   rootPublicKey = "";
 
   @property()
