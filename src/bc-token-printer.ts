@@ -384,14 +384,16 @@ export class BcTokenPrinter extends LitElement {
       font-size: 0.8em;
     }
 
-    .revocation-id {
+    .revocation-id,
+    .external-key {
       overflow: hidden;
       diplay: inline-block;
       text-overflow: ellipsis;
       max-width: 100;
     }
 
-    .revocation-id > .id {
+    .revocation-id,
+    .external-key > .id {
       user-select: all;
     }
 
