@@ -57,8 +57,9 @@ export class BcAuthorizerExample extends LitElement {
 
     if (this.started) {
       var state = {
-        token_blocks: [],
+        token_blocks: [""],
         authorizer_code: code,
+        external_private_keys: [],
         query: "",
       };
       var result = execute(state);

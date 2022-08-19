@@ -19,7 +19,7 @@ import {
 export class BCDatalogPlayground extends LitElement {
   @property() code = "";
   @property() showBlocks = false;
-  @state() blocks: Array<string> = [];
+  @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
 
   constructor() {
@@ -32,7 +32,8 @@ export class BCDatalogPlayground extends LitElement {
     const blockChildren = this.querySelectorAll("code.block");
     this.blocks = Array.from(blockChildren)
       .map((b) => b.textContent?.trim() ?? "")
-      .filter((x) => x !== "");
+      .filter((x) => x !== "")
+      .map((code) => ({ code, externalKey: null }));
   }
 
   firstUpdated() {
@@ -41,13 +42,25 @@ export class BCDatalogPlayground extends LitElement {
 
   addBlock() {
     const newBlocks = [...this.blocks];
-    newBlocks.push("");
+    newBlocks.push({ code: "", externalKey: null });
     this.blocks = newBlocks;
   }
 
   onUpdatedBlock(blockId: number, e: { detail: { code: string } }) {
     const newBlocks = [...this.blocks];
-    newBlocks[blockId] = e.detail.code;
+    newBlocks[blockId] = {
+      code: e.detail.code,
+      externalKey: newBlocks[blockId].externalKey,
+    };
+    this.blocks = newBlocks;
+  }
+
+  onUpdatedExternalKey(blockId: number, e: InputEvent) {
+    const newBlocks = [...this.blocks];
+    newBlocks[blockId] = {
+      code: newBlocks[blockId].code,
+      externalKey: (e.target as HTMLInputElement).value.trim(),
+    };
     this.blocks = newBlocks;
   }
 
@@ -67,10 +80,14 @@ export class BCDatalogPlayground extends LitElement {
       authorizer: [],
     };
     if (this.started) {
+      const validBlocks = this.blocks.filter((x) => x.code !== "");
       const authorizerQuery = {
-        token_blocks: this.blocks.filter((x) => x !== ""),
+        token_blocks: validBlocks.map(({ code }) => code),
         authorizer_code: this.code,
         query: "",
+        external_private_keys: validBlocks.map(
+          ({ externalKey }) => externalKey
+        ),
       };
       const authorizerResult = execute(authorizerQuery);
       console.warn({ authorizerQuery, authorizerResult });
@@ -104,6 +121,16 @@ export class BCDatalogPlayground extends LitElement {
     `;
   }
 
+  renderExternalKeyInput(blockId: number) {
+    if (blockId <= 0) return;
+
+    return html`
+      <input
+        @input=${(e: InputEvent) => this.onUpdatedExternalKey(blockId, e)}
+      />
+    `;
+  }
+
   renderBlock(
     blockId: number,
     code: string,
@@ -111,7 +138,9 @@ export class BCDatalogPlayground extends LitElement {
     errors: Array<CMError>
   ) {
     return html`
-        <p>${blockId == 0 ? "Authority block" : "Block " + blockId}:</p>
+        <p>${
+          blockId == 0 ? "Authority block" : "Block " + blockId
+        }: ${this.renderExternalKeyInput(blockId)}</p>
       <bc-datalog-editor
         datalog=${code}
         .markers=${markers ?? []}
@@ -127,7 +156,7 @@ export class BCDatalogPlayground extends LitElement {
     if (!this.showBlocks) return;
 
     return html`
-      ${this.blocks.map((code, id) => {
+      ${this.blocks.map(({ code }, id) => {
         return this.renderBlock(id, code, markers[id], errors[id]);
       })}
       <button @click=${this.addBlock}>Add block</button>

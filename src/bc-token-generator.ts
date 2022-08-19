@@ -19,7 +19,9 @@ export class BcTokenGenerator extends LitElement {
   _publicKey = "";
 
   @state()
-  _blocks = [""];
+  _blocks: Array<{ code: string; externalKey: string | null }> = [
+    { code: "", externalKey: null },
+  ];
 
   @state()
   _started = false;
@@ -30,7 +32,19 @@ export class BcTokenGenerator extends LitElement {
 
   _onUpdatedBlock(blockId: number, e: { detail: { code: string } }) {
     const newBlocks = [...this._blocks];
-    newBlocks[blockId] = e.detail.code;
+    newBlocks[blockId] = {
+      code: e.detail.code,
+      externalKey: this._blocks[blockId].externalKey,
+    };
+    this._blocks = newBlocks;
+  }
+
+  _onUpdatedBlockKey(blockId: number, e: InputEvent) {
+    const newBlocks = [...this._blocks];
+    newBlocks[blockId] = {
+      code: this._blocks[blockId].code,
+      externalKey: (e.target as HTMLInputElement).value.trim(),
+    };
     this._blocks = newBlocks;
   }
 
@@ -42,7 +56,7 @@ export class BcTokenGenerator extends LitElement {
 
   addBlock() {
     const newBlocks = [...this._blocks];
-    newBlocks.push("");
+    newBlocks.push({ code: "", externalKey: null });
     this._blocks = newBlocks;
   }
 
@@ -73,9 +87,19 @@ export class BcTokenGenerator extends LitElement {
     `;
   }
 
+  renderBlockKeyInput(blockId: number) {
+    if (blockId <= 0) return;
+
+    return html`<input
+      @input=${(e: InputEvent) => this._onUpdatedBlockKey(blockId, e)}
+      placeholder="Third party private key"
+    />`;
+  }
+
   renderBlock(blockId: number, errors: Array<LibError> = []) {
     return html`
       <p>${blockId == 0 ? "Authority block" : "Block " + blockId}:</p>
+      ${this.renderBlockKeyInput(blockId)}
       <bc-datalog-editor
         code="${this._blocks[blockId] ?? ""}"
         .parseErrors=${errors.map(convertError)}
@@ -89,14 +113,21 @@ export class BcTokenGenerator extends LitElement {
   render() {
     if (!this._started) return this.renderNotStarted();
 
+    const nonEmptyBlocks = this._blocks.filter(({ code }) => code !== "");
+
+    const query = {
+      token_blocks: nonEmptyBlocks.map(({ code }) => code),
+      private_key: this._privateKey,
+      external_private_keys: nonEmptyBlocks.map(
+        ({ externalKey }) => externalKey
+      ),
+    };
+
     let result: Result<string, GeneratorError>;
 
     try {
       result = {
-        Ok: generate_token({
-          token_blocks: this._blocks.filter((b) => b !== ""),
-          private_key: this._privateKey,
-        }),
+        Ok: generate_token(query),
       };
     } catch (error) {
       result = { Err: error as GeneratorError };

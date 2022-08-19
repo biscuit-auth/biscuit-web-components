@@ -79,6 +79,7 @@ export class BcFullExample extends LitElement {
       token_blocks: blocks,
       authorizer_code: this._authorizer,
       query: "",
+      external_private_keys: [],
     };
 
     console.log("WILL EXECUTE");

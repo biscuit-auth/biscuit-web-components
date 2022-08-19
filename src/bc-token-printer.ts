@@ -3,7 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import { initialize } from "./wasm.js";
 import {
-  execute,
+  execute_serialized,
   parse_token,
   attenuate_token,
 } from "@biscuit-auth/biscuit-wasm-support";
@@ -34,6 +34,9 @@ export class BcTokenPrinter extends LitElement {
   @property()
   authorizer = "";
 
+  @state()
+  rootPublicKey = "";
+
   @property()
   showAttenuation = false;
 
@@ -58,6 +61,10 @@ export class BcTokenPrinter extends LitElement {
   _onUpdatedToken(e: InputEvent) {
     if (this.readonly) return;
     this.biscuit = (e.target as HTMLInputElement).value.trim();
+  }
+
+  _onUpdatedPublicKey(e: InputEvent) {
+    this.rootPublicKey = (e.target as HTMLInputElement).value.trim();
   }
 
   _onUpdatedAuthorizer(e: { detail: { code: string } }) {
@@ -112,7 +119,11 @@ export class BcTokenPrinter extends LitElement {
 
   renderResult(
     error: string,
-    blocks: Array<{ code: string; revocation_id: string }>,
+    blocks: Array<{
+      code: string;
+      revocation_id: string;
+      external_key?: string;
+    }>,
     blockMarkers: Array<LibMarker>
   ) {
     if (this.biscuit === "") {
@@ -140,6 +151,9 @@ export class BcTokenPrinter extends LitElement {
         <p class="revocation-id">Revocation id: <span class="id">${
           block.revocation_id
         }</span></p>
+        <p class="external-key">Signed by: <span class="id">${
+          block.external_key ?? "n/a"
+        }</span></p>
         <bc-datalog-editor
           datalog=${block.code}
           .markers=${blockMarkers[index] ?? []}
@@ -160,6 +174,14 @@ export class BcTokenPrinter extends LitElement {
 
     return html`
       <div class="code">
+        <p class="public-key-input">
+          <label for="public-key">Public key</label>
+          <input
+            @input=${this._onUpdatedPublicKey}
+            id="public-key"
+            value="${this.rootPublicKey}"
+          />
+        </p>
         <p>Authorizer</p>
         <bc-authorizer-editor
           code="${this.authorizer}"
@@ -246,13 +268,15 @@ export class BcTokenPrinter extends LitElement {
     const blocks = parseResult.token_blocks.map((code: string, i: number) => ({
       code,
       revocation_id: parseResult.revocation_ids[i],
+      external_key: parseResult.external_keys[i],
     }));
     const authorizerQuery = {
-      token_blocks: blocks.map((b: { code: string }) => b.code),
+      token: this.biscuit,
+      root_public_key: this.rootPublicKey,
       authorizer_code: this.authorizer,
       query: "",
     };
-    const authorizerResult = execute(authorizerQuery);
+    const authorizerResult = execute_serialized(authorizerQuery);
     const blockMarkers =
       authorizerResult.Ok?.token_blocks.map(
         (b: { markers: Array<LibMarker> }) => b.markers.map(convertMarker)
@@ -279,6 +303,19 @@ export class BcTokenPrinter extends LitElement {
       display: flex;
       flex-direction: column;
       text-align: left;
+    }
+
+    .public-key-input {
+      display: flex;
+    }
+
+    .public-key-input label {
+      height: 1.5em;
+    }
+
+    #public-key {
+      margin-left: 1em;
+      flex-grow: 1;
     }
 
     @media (prefers-color-scheme: dark) {
