@@ -34,12 +34,12 @@ export class BCDatalogPlayground extends LitElement {
       .map((b, i) => {
         const code = b.textContent?.trim() ?? "";
         let externalKey = null;
-        if(i > 0) {
+        if (i > 0) {
           externalKey = b.getAttribute("privateKey");
         }
         return { code, externalKey };
       })
-      .filter(({code}) => code !== "");
+      .filter(({ code }) => code !== "");
   }
 
   firstUpdated() {
@@ -89,7 +89,10 @@ export class BCDatalogPlayground extends LitElement {
     if (this.started) {
       const validBlocks = this.blocks.filter((x) => x.code !== "");
       const authorizerQuery = {
-        token_blocks: validBlocks.length > 0 ? validBlocks.map(({ code }) => code) : ['check if true'],
+        token_blocks:
+          validBlocks.length > 0
+            ? validBlocks.map(({ code }) => code)
+            : ["check if true"],
         authorizer_code: this.code,
         query: "",
         external_private_keys: validBlocks.map(
