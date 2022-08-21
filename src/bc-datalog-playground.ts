@@ -82,7 +82,7 @@ export class BCDatalogPlayground extends LitElement {
     if (this.started) {
       const validBlocks = this.blocks.filter((x) => x.code !== "");
       const authorizerQuery = {
-        token_blocks: validBlocks.map(({ code }) => code),
+        token_blocks: validBlocks.length > 0 ? validBlocks.map(({ code }) => code) : ['check if true'],
         authorizer_code: this.code,
         query: "",
         external_private_keys: validBlocks.map(
