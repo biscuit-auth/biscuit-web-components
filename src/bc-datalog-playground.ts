@@ -31,9 +31,15 @@ export class BCDatalogPlayground extends LitElement {
     }
     const blockChildren = this.querySelectorAll("code.block");
     this.blocks = Array.from(blockChildren)
-      .map((b) => b.textContent?.trim() ?? "")
-      .filter((x) => x !== "")
-      .map((code) => ({ code, externalKey: null }));
+      .map((b, i) => {
+        const code = b.textContent?.trim() ?? "";
+        let externalKey = null;
+        if(i > 0) {
+          externalKey = b.getAttribute("privateKey");
+        }
+        return { code, externalKey };
+      })
+      .filter(({code}) => code !== "");
   }
 
   firstUpdated() {
@@ -57,9 +63,10 @@ export class BCDatalogPlayground extends LitElement {
 
   onUpdatedExternalKey(blockId: number, e: InputEvent) {
     const newBlocks = [...this.blocks];
+    const newValue = (e.target as HTMLInputElement).value.trim();
     newBlocks[blockId] = {
       code: newBlocks[blockId].code,
-      externalKey: (e.target as HTMLInputElement).value.trim(),
+      externalKey: newValue !== "" ? newValue : null,
     };
     this.blocks = newBlocks;
   }
@@ -127,6 +134,7 @@ export class BCDatalogPlayground extends LitElement {
     return html`
       <input
         @input=${(e: InputEvent) => this.onUpdatedExternalKey(blockId, e)}
+        value=${this.blocks[blockId].externalKey}
       />
     `;
   }
