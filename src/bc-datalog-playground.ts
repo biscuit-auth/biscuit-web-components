@@ -25,21 +25,21 @@ export class BCDatalogPlayground extends LitElement {
   constructor() {
     super();
 
-    const codeChild = this.querySelector("code.authorizer");
+    const codeChild = this.querySelector(".authorizer");
     if (codeChild !== null) {
-      this.code = codeChild.textContent?.trim() ?? "";
+      this.code = codeChild.textContent ?? "";
     }
-    const blockChildren = this.querySelectorAll("code.block");
+    const blockChildren = this.querySelectorAll(".block");
     this.blocks = Array.from(blockChildren)
       .map((b, i) => {
-        const code = b.textContent?.trim() ?? "";
+        const code = b.textContent ?? "";
         let externalKey = null;
         if (i > 0) {
           externalKey = b.getAttribute("privateKey");
         }
         return { code, externalKey };
       })
-      .filter(({ code }) => code !== "");
+      .filter(({ code }, i) => i === 0 || code !== "");
   }
 
   firstUpdated() {
