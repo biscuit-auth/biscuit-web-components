@@ -19,6 +19,8 @@ import {
 export class BCDatalogPlayground extends LitElement {
   @property() fromHash = null;
   @property() showBlocks = false;
+  @property() displayFacts = false;
+  @property() displayExternalKeys = false;
   @state() code = "";
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
@@ -66,6 +68,14 @@ export class BCDatalogPlayground extends LitElement {
       if (name === "showblocks") {
           console.log(newval)
           this.showBlocks = newval === "true";
+      }
+
+      if (name === "displayfacts") {
+          this.displayFacts = newval === "true";
+      }
+
+      if (name === "displayexternalkeys") {
+          this.displayExternalKeys = newval === "true";
       }
   }
 
@@ -141,28 +151,33 @@ export class BCDatalogPlayground extends LitElement {
         ) ?? [];
     }
 
+
+    const factContent = html`<p>Facts</p>
+      <bc-authorizer-content
+        .content=${authorizer_world}
+      ></bc-authorizer-content>`;
+
+    const facts = this.displayFacts ? factContent : html``;
+
     return html`
       ${this.renderBlocks(markers.blocks, parseErrors.blocks)}
       ${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}
       <p>Result</p>
       <bc-authorizer-result .content=${authorizer_result}>
       </bc-authorizer-result>
-      <p>Facts</p>
-      <bc-authorizer-content
-        .content=${authorizer_world}
-      ></bc-authorizer-content>
+      ${facts}
     `;
   }
 
   renderExternalKeyInput(blockId: number) {
     if (blockId <= 0) return;
 
-    return html`
+    return this.displayExternalKeys ? html`:
       <input
         @input=${(e: InputEvent) => this.onUpdatedExternalKey(blockId, e)}
         value=${this.blocks[blockId].externalKey}
       />
-    `;
+    ` : html``;
   }
 
   renderBlock(
@@ -174,7 +189,7 @@ export class BCDatalogPlayground extends LitElement {
     return html`
         <p>${
           blockId == 0 ? "Authority block" : "Block " + blockId
-        }: ${this.renderExternalKeyInput(blockId)}</p>
+        } ${this.renderExternalKeyInput(blockId)}</p>
       <bc-datalog-editor
         datalog=${code}
         .markers=${markers ?? []}
