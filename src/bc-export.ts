@@ -25,6 +25,7 @@ class BcExport extends LitElement {
   onClick() {
     const data = {code:this.code, blocks:this.blocks}
     const hash = encodeURIComponent(btoa(JSON.stringify(data)))
+    dispatchCustomEvent(this, "export", {hash}, {bubble: true})
     navigator.clipboard.writeText(hash).then(() => {
       if (this.shadowRoot !== null) {
         const confirmationElement = this.shadowRoot.querySelector(".confirmation") as HTMLLIElement;
@@ -40,7 +41,7 @@ class BcExport extends LitElement {
     return html`
       <div class="container">
         <button @click="${this.onClick}">Export</button>
-        <div class="confirmation">Hash copied to clipboard!</div>
+        <div class="confirmation">Hash copied to clipboard and URL updated!</div>
       </div>
     `
   }

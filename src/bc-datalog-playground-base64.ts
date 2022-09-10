@@ -7,6 +7,7 @@ import "./bc-export";
 import { initialize } from "./wasm.js";
 import { execute, generate_keypair } from "@biscuit-auth/biscuit-wasm-support";
 import { CMError, CMMarker, convertError, convertMarker, LibError, LibMarker } from "./lib/adapters";
+import { dispatchCustomEvent } from "./lib/events";
 
 /**
  * A fully tunable datalog biscuit playground
@@ -156,6 +157,17 @@ export class BCDatalogPlayground extends LitElement {
     this.requestUpdate("blocks");
   }
 
+  //Export button pressed
+  onExport(e: CustomEvent) {
+      const event = new CustomEvent("export", {
+        detail: e.detail,
+        bubbles: true,
+        composed: true
+      })
+      this.dispatchEvent(event)
+
+  }
+
   // Main rendering method
   render() {
     let authorizer_world = [];
@@ -211,7 +223,7 @@ export class BCDatalogPlayground extends LitElement {
 
     // Display export module
     const exportContent = html `
-      <bc-export code="${this.code}" .blocks="${this.blocks}"></bc-export>
+      <bc-export @bc-export:export="${(e: CustomEvent) => this.onExport(e)}" code="${this.code}" .blocks="${this.blocks}"></bc-export>
     `;
 
     const exportComponent = this.displayExport ? exportContent : ``;

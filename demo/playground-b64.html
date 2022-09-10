@@ -22,19 +22,53 @@
 
   const hash = params.hash ? params.hash : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D'
   const exportState = params.export === '1';
-  const thirdState = params.third_party === '1';
+  const thirdParty = params.third_party === '1';
   const factsState = params.facts === '1';
   const customExternal = params.custom_external === '1';
   const blocks = params.blocks === '1';
 
-  appElement.innerHTML = `<bc-datalog-playground-b64
+  appElement.innerHTML = `<bc-datalog-playground-b64 id="playground"
       displayExport="${exportState}"
       displayFacts="${factsState}"
-      displayExternalKeys="${thirdState}"
+      displayExternalKeys="${thirdParty}"
       allowCustomExternalKeys="${customExternal}"
       showBlocks="${blocks}"
       fromHash="${hash}"></bc-datalog-playground-b64>`
 
+  setTimeout(() => {
+    const playground = document.querySelector("#playground");
+    if (playground !== null) {
+      playground.addEventListener("export", (e) => {
+        let data = e.detail.hash;
+        let urlParams = new URLSearchParams();
+        if (exportState) {
+          urlParams.set("export", "1")
+        }
+        if (blocks) {
+          urlParams.set("blocks", "1")
+        }
+        if (thirdParty) {
+          urlParams.set("third_party", "1")
+        }
+
+        if (factsState) {
+          urlParams.set("facts", "1")
+        }
+
+        if (customExternal) {
+          urlParams.set("custom_external", "1")
+        }
+
+        urlParams.set("hash", data)
+
+        const old_location = window.location.toString();
+        const new_url = new URL(old_location)
+        new_url.search = urlParams.toString()
+
+        window.history.pushState("", "", new_url.toString())
+      })
+    }
+  })
 </script>
 
 </body>
