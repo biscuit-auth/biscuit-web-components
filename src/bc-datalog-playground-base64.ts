@@ -2,7 +2,8 @@ import { html, css, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import "./bc-switch";
-import "./bc-3rd-party-details"
+import "./bc-3rd-party-details";
+import "./bc-export";
 import { initialize } from "./wasm.js";
 import { execute, generate_keypair, get_public_key } from "@biscuit-auth/biscuit-wasm-support";
 import {
@@ -22,6 +23,7 @@ export class BCDatalogPlayground extends LitElement {
   @property() fromHash = null;
   @property() showBlocks = false;
   @property() displayFacts = false;
+  @property() displayExport = false;
   @property() displayExternalKeys = false;
   @state() code = "";
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
@@ -74,7 +76,7 @@ export class BCDatalogPlayground extends LitElement {
           });
 
           this.blocks = data.blocks;
-          this.code = data.authorizer;
+          this.code = data.code;
       }
 
       if (name === "showblocks") {
@@ -89,6 +91,10 @@ export class BCDatalogPlayground extends LitElement {
       if (name === "displayexternalkeys") {
           this.displayExternalKeys = newval === "true";
       }
+
+      if (name === "displayexport") {
+        this.displayExport = newval === "true";
+      }
   }
 
   addBlock() {
@@ -102,16 +108,6 @@ export class BCDatalogPlayground extends LitElement {
     newBlocks[blockId] = {
       code: e.detail.code,
       externalKey: newBlocks[blockId].externalKey,
-    };
-    this.blocks = newBlocks;
-  }
-
-  onUpdatedExternalKey(blockId: number, e: InputEvent) {
-    const newBlocks = [...this.blocks];
-    const newValue = (e.target as HTMLInputElement).value.trim();
-    newBlocks[blockId] = {
-      code: newBlocks[blockId].code,
-      externalKey: newValue !== "" ? newValue : null,
     };
     this.blocks = newBlocks;
   }
@@ -171,7 +167,14 @@ export class BCDatalogPlayground extends LitElement {
 
     const facts = this.displayFacts ? factContent : html``;
 
+    const exportContent = html `
+      <bc-export code="${this.code}" .blocks="${this.blocks}"></bc-export>
+    `;
+
+    const exportComponent = this.displayExport ? exportContent : ``;
+
     return html`
+      ${exportComponent}
       ${this.renderBlocks(markers.blocks, parseErrors.blocks)}
       ${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}
       <p>Result</p>
@@ -206,7 +209,12 @@ export class BCDatalogPlayground extends LitElement {
     errors: Array<CMError>
   ) {
 
-    const switchContent = blockId !== 0 ? html`| <bc-switch @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" leftLabel="Attenuation Block" rightLabel="3rd Party Block" checked="false"></bc-switch>` : ``;
+    const switchContent = blockId !== 0 ? html`| 
+    <bc-switch 
+      @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" 
+      leftLabel="Attenuation Block" 
+      rightLabel="3rd Party Block" 
+      checked="${this.blocks[blockId].externalKey !== null ? "true" : "false"}"></bc-switch>` : ``;
     const blockDetails = blockId !== 0 && this.blocks[blockId].externalKey !== null ? html`<bc-3rd-party-details privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
 
     return html`
