@@ -1,8 +1,10 @@
-import { html, LitElement } from "lit";
+import { html, css, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
+import "./bc-switch";
+import "./bc-3rd-party-details"
 import { initialize } from "./wasm.js";
-import { execute } from "@biscuit-auth/biscuit-wasm-support";
+import { execute, generate_keypair, get_public_key } from "@biscuit-auth/biscuit-wasm-support";
 import {
   convertMarker,
   convertError,
@@ -25,6 +27,19 @@ export class BCDatalogPlayground extends LitElement {
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
 
+  static styles = css`
+    
+    .block {
+      margin-bottom: 20px;
+    }
+    
+    .blockHeader {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+  `;
+
   constructor() {
     super();
     const codeChild = this.querySelector(".authorizer");
@@ -44,14 +59,11 @@ export class BCDatalogPlayground extends LitElement {
       .filter(({ code }, i) => i === 0 || code !== "");
   }
 
-
-
   firstUpdated() {
     initialize().then(() => (this.started = true));
   }
 
   attributeChangedCallback(name: string, oldval: string | null, newval: string | null) {
-      console.log(name)
       if (name === "fromhash" && newval !== null) {
 
           const data = JSON.parse(atob(decodeURIComponent(newval)), function(k, v) {
@@ -169,15 +181,22 @@ export class BCDatalogPlayground extends LitElement {
     `;
   }
 
-  renderExternalKeyInput(blockId: number) {
-    if (blockId <= 0) return;
-
-    return this.displayExternalKeys ? html`:
-      <input
-        @input=${(e: InputEvent) => this.onUpdatedExternalKey(blockId, e)}
-        value=${this.blocks[blockId].externalKey}
-      />
-    ` : html``;
+  onBlockSwitch(blockId: number, state: boolean) {
+    if (state) {
+      // 3rd party
+      console.debug("3rd party")
+      if (this.blocks[blockId].externalKey === null) {
+        // unitialized 3rd party block
+        const keypair = generate_keypair();
+        this.blocks[blockId].externalKey = keypair.private_key
+        this.requestUpdate("blocks")
+      }
+    } else {
+      // attenuate
+      console.debug("attenuate")
+      this.blocks[blockId].externalKey = null
+      this.requestUpdate("blocks")
+    }
   }
 
   renderBlock(
@@ -186,19 +205,27 @@ export class BCDatalogPlayground extends LitElement {
     markers: Array<CMMarker>,
     errors: Array<CMError>
   ) {
+
+    const switchContent = blockId !== 0 ? html`| <bc-switch @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" leftLabel="Attenuation Block" rightLabel="3rd Party Block" checked="false"></bc-switch>` : ``;
+    const blockDetails = blockId !== 0 && this.blocks[blockId].externalKey !== null ? html`<bc-3rd-party-details privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
+
     return html`
-        <p>${
-          blockId == 0 ? "Authority block" : "Block " + blockId
-        } ${this.renderExternalKeyInput(blockId)}</p>
-      <bc-datalog-editor
-        datalog=${code}
-        .markers=${markers ?? []}
-        .parseErrors=${errors ?? []}
-        @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
-          this.onUpdatedBlock(blockId, e)}
-        }
-      >
-      </bc-authorizer-editor>`;
+      <div class="block">
+        <div class="blockHeader">
+          <div>${blockId == 0 ? "Authority block" : "Block " + blockId}</div>
+          ${switchContent}
+          ${blockDetails}
+        </div>
+
+        <bc-datalog-editor
+          datalog=${code}
+          .markers=${markers ?? []}
+          .parseErrors=${errors ?? []}
+          @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
+            this.onUpdatedBlock(blockId, e)}
+          }
+        />
+      </div>`;
   }
 
   renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
