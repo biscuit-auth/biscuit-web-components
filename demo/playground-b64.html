@@ -11,25 +11,25 @@
 <body>
 <h1>demo biscuit</h1>
 
-<style>
-  bc-datalog-playground {
-    --editor-font: 20px;
-  }
-</style>
+<div id="app"></div>
 
-<!--<bc-datalog-playground-b64 displayFacts="false" showBlocks="true" fromHash="eyJhdXRob3JpemVyIjoiY2hlY2sgaWYgdXNlcigxMik7XG5hbGxvdyBpZiB0cnVlOyIsImJsb2NrcyI6W3siY29kZSI6InVzZXIoMTIpOyIsImV4dGVybmFsS2V5IjpudWxsfV19">-->
+<script type="application/javascript">
+  let appElement = document.querySelector("#app");
 
-<!--</bc-datalog-playground-b64>-->
+  const params = new Proxy(new URLSearchParams(window.location.search), {
+    get: (searchParams, prop) => searchParams.get(prop),
+  });
 
+  const hash = params.hash ? params.hash : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D'
 
-<!--<bc-datalog-playground-b64 displayFacts="true" showBlocks="true" fromHash="eyJhdXRob3JpemVyIjoiY2hlY2sgaWYgdXNlcigxMik7XG5hbGxvdyBpZiB0cnVlOyIsImJsb2NrcyI6W3siY29kZSI6InVzZXIoMTIpOyIsImV4dGVybmFsS2V5IjpudWxsfV19">-->
+  appElement.innerHTML = `<bc-datalog-playground-b64
+      displayExport="true"
+      displayFacts="false"
+      displayExternalKeys="true"
+      showBlocks="true"
+      fromHash="${hash}"></bc-datalog-playground-b64>`
 
-<!--</bc-datalog-playground-b64>-->
-
-<bc-datalog-playground-b64 displayExport="true" displayFacts="false" displayExternalKeys="true" showBlocks="true" fromHash="eyJjb2RlIjoiY2hlY2sgaWYgdXNlcigxMik7XG5jaGVjayBpZiBvcmcoMTIpIHRydXN0aW5nIGVkMjU1MTkvMTExYTc1MGE1MTA5M2UzM2E5ZGJhMTQ5MmEzY2E5NzhmNjE5NmViYjMwYmZlMzlhOTM4Yjk2MDdmZjA5MjNhYTtcbmNoZWNrIGlmIHNlcnZpY2UoJHMpLCBbXCJjb21wdGFcIiwgXCJiYW5xdWVcIl0uY29udGFpbnMoJHMpO1xuYWxsb3cgaWYgdHJ1ZTsiLCJibG9ja3MiOlt7ImNvZGUiOiJ1c2VyKDEyKTtcbnNlcnZpY2UoXCJjb21wdGFcIik7IiwiZXh0ZXJuYWxLZXkiOm51bGx9LHsiY29kZSI6Im9yZygxMikiLCJleHRlcm5hbEtleSI6IjdlODFjY2MzM2I3NWE4OGFmYjgwOTVmNmM3ZDcwYTk1YWJkZjQyZjFiZmQ2YTI0ZjdkNmViNmI2Zjk2NDI0MjEifV19">
-
-</bc-datalog-playground-b64>
-
+</script>
 
 </body>
 </html>

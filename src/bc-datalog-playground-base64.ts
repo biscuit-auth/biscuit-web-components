@@ -209,13 +209,15 @@ export class BCDatalogPlayground extends LitElement {
     errors: Array<CMError>
   ) {
 
-    const switchContent = blockId !== 0 ? html`| 
+    const switchContent = this.displayExternalKeys && blockId !== 0 ? html`| 
     <bc-switch 
       @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" 
       leftLabel="Attenuation Block" 
       rightLabel="3rd Party Block" 
       checked="${this.blocks[blockId].externalKey !== null ? "true" : "false"}"></bc-switch>` : ``;
-    const blockDetails = blockId !== 0 && this.blocks[blockId].externalKey !== null ? html`<bc-3rd-party-details privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
+    const blockDetails = this.displayExternalKeys && blockId !== 0 &&
+                         this.blocks[blockId].externalKey !== null ?
+      html`<bc-3rd-party-details privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
 
     return html`
       <div class="block">
