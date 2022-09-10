@@ -24,12 +24,15 @@
   const exportState = params.export === '1';
   const thirdState = params.third_party === '1';
   const factsState = params.facts === '1';
+  const customExternal = params.custom_external === '1';
+  const blocks = params.blocks === '1';
 
   appElement.innerHTML = `<bc-datalog-playground-b64
       displayExport="${exportState}"
       displayFacts="${factsState}"
       displayExternalKeys="${thirdState}"
-      showBlocks="true"
+      allowCustomExternalKeys="${customExternal}"
+      showBlocks="${blocks}"
       fromHash="${hash}"></bc-datalog-playground-b64>`
 
 </script>
