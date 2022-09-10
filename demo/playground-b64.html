@@ -20,13 +20,6 @@
     get: (searchParams, prop) => searchParams.get(prop),
   });
 
-  console.log(encodeURIComponent(btoa(JSON.stringify({
-    code: "",
-    blocks: [
-      {code: " ", externalKey: null}
-    ]
-  }))))
-
   const hash = params.hash ? params.hash : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D'
   const exportState = params.export === '1';
   const thirdState = params.third_party === '1';

@@ -40,6 +40,13 @@ export class BCDatalogPlayground extends LitElement {
       gap: 10px;
       margin-bottom: 10px;
     }
+    
+    .blockHeader .close {
+      font-size: 1.5em;
+      line-height: 10px;
+      cursor: pointer;
+      padding: 5px;
+    }
   `;
 
   constructor() {
@@ -101,6 +108,12 @@ export class BCDatalogPlayground extends LitElement {
     const newBlocks = [...this.blocks];
     newBlocks.push({ code: "", externalKey: null });
     this.blocks = newBlocks;
+  }
+
+  deleteBlock(blockId: number) {
+    console.debug("deleting block")
+    this.blocks.splice(blockId, 1)
+    this.requestUpdate("blocks")
   }
 
   onUpdatedBlock(blockId: number, e: { detail: { code: string } }) {
@@ -219,9 +232,12 @@ export class BCDatalogPlayground extends LitElement {
                          this.blocks[blockId].externalKey !== null ?
       html`<bc-3rd-party-details privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
 
+    const close = blockId !== 0 ? html`<div @click="${() => this.deleteBlock(blockId)}" class="close">&times;</div>` : ''
+
     return html`
       <div class="block">
         <div class="blockHeader">
+          ${close}
           <div>${blockId == 0 ? "Authority block" : "Block " + blockId}</div>
           ${switchContent}
           ${blockDetails}

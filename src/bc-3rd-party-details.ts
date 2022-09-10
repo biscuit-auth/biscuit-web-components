@@ -4,8 +4,6 @@ import {
   generate_keypair,
   get_public_key
 } from "@biscuit-auth/biscuit-wasm-support";
-import { dispatchCustomEvent } from "./lib/events";
-import doc = Mocha.reporters.doc;
 
 @customElement("bc-3rd-party-details")
 class ThirdPartyBlockDetails extends LitElement {
