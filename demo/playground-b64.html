@@ -25,6 +25,7 @@
   const thirdParty = params.third_party === '1';
   const factsState = params.facts === '1';
   const customExternal = params.custom_external === '1';
+  const regenerate = params.regenerate === '1';
   const blocks = params.blocks === '1';
 
   appElement.innerHTML = `<bc-datalog-playground-b64 id="playground"
@@ -32,6 +33,7 @@
       displayFacts="${factsState}"
       displayExternalKeys="${thirdParty}"
       allowCustomExternalKeys="${customExternal}"
+      allowsRegenerate="${regenerate}"
       showBlocks="${blocks}"
       fromHash="${hash}"></bc-datalog-playground-b64>`
 
@@ -57,6 +59,10 @@
 
         if (customExternal) {
           urlParams.set("custom_external", "1")
+        }
+
+        if (regenerate) {
+          urlParams.set("regenerate", "1")
         }
 
         urlParams.set("hash", data)

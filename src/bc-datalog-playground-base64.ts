@@ -1,13 +1,13 @@
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor.js";
 import "./bc-switch";
-import "./bc-3rd-party-details";
+import "./bc-key-details";
 import "./bc-export";
 import { initialize } from "./wasm.js";
 import { execute, generate_keypair } from "@biscuit-auth/biscuit-wasm-support";
 import { CMError, CMMarker, convertError, convertMarker, LibError, LibMarker } from "./lib/adapters";
-import { dispatchCustomEvent } from "./lib/events";
+import { token_from_query } from "./lib/token";
 
 /**
  * A fully tunable datalog biscuit playground
@@ -20,6 +20,7 @@ export class BCDatalogPlayground extends LitElement {
   @property() displayExport = false;
   @property() displayExternalKeys = false;
   @property() allowCustomExternalKeys = false;
+  @property() allowsRegenerate = "false";
   @state() code = "";
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
@@ -41,6 +42,22 @@ export class BCDatalogPlayground extends LitElement {
       line-height: 10px;
       cursor: pointer;
       padding: 5px;
+    }
+
+    code {
+      border: 1px rgba(128, 128, 128, 0.4) solid;
+      display: flex;
+      flex-direction: column;
+      text-wrap: none;
+      overflow-wrap: anywhere;
+      max-width: fit-content;
+    }
+
+    .content code {
+      user-select: all;
+      max-width: 50%;
+      padding: 10px;
+      box-sizing: border-box;
     }
   `;
 
@@ -64,7 +81,13 @@ export class BCDatalogPlayground extends LitElement {
   }
 
   firstUpdated() {
-    initialize().then(() => (this.started = true));
+    initialize().then(() => {
+      if (this.blocks[0].externalKey === null) {
+        const keypair = generate_keypair();
+        this.blocks[0].externalKey = keypair.private_key;
+      }
+      this.started = true;
+    });
   }
 
   // Triggered when attributes change
@@ -100,6 +123,10 @@ export class BCDatalogPlayground extends LitElement {
 
       if (name === "allowcustomexternalkeys") {
         this.allowCustomExternalKeys = newval === "true"
+      }
+
+      if (name === "allowsregenerate" && newval !== null) {
+        this.allowsRegenerate = newval
       }
   }
 
@@ -168,6 +195,13 @@ export class BCDatalogPlayground extends LitElement {
 
   }
 
+  // Regenerate the private key
+  onRegeneratePrivateKey() {
+    const keypair = generate_keypair();
+    this.blocks[0].externalKey = keypair.private_key;
+    this.requestUpdate("blocks")
+  }
+
   // Main rendering method
   render() {
     let authorizer_world = [];
@@ -227,6 +261,7 @@ export class BCDatalogPlayground extends LitElement {
     `;
 
     const exportComponent = this.displayExport ? exportContent : ``;
+    const token = this.renderToken()
 
     return html`
       ${exportComponent}
@@ -236,6 +271,7 @@ export class BCDatalogPlayground extends LitElement {
       <bc-authorizer-result .content=${authorizer_result}>
       </bc-authorizer-result>
       ${facts}
+      ${token}
     `;
   }
 
@@ -256,12 +292,26 @@ export class BCDatalogPlayground extends LitElement {
       checked="${this.blocks[blockId].externalKey !== null ? "true" : "false"}"></bc-switch>` : ``;
 
     // Display the public key copy button, the private key input
-    const blockDetails = this.displayExternalKeys && blockId !== 0 &&
-                         this.blocks[blockId].externalKey !== null ?
-      html`<bc-3rd-party-details 
-        @bc-3rd-party-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(blockId, e)}"
+    let blockDetails;
+
+    // Blocks
+    if (this.displayExternalKeys && blockId !== 0 &&
+      this.blocks[blockId].externalKey !== null) {
+      blockDetails = html`<bc-key-details 
+        @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(blockId, e)}"
         .allowsCustomKey=${this.allowCustomExternalKeys} 
-        privateKey="${this.blocks[blockId].externalKey}"></bc-3rd-party-details>` : ``;
+        privateKey="${this.blocks[blockId].externalKey}"></bc-key-details>`;
+    }
+
+    // Authority
+    if ( blockId === 0 && this.blocks[0].externalKey !== null) {
+      blockDetails = html`<bc-key-details 
+        @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(0, e)}"
+        @bc-key-details:regenerate="${this.onRegeneratePrivateKey}"
+        .allowsCustomKey=${this.allowCustomExternalKeys}
+        allowsRegenerate=${this.allowsRegenerate}
+        privateKey="${this.blocks[0].externalKey}"></bc-key-details>`;
+    }
 
     const close = blockId !== 0 ?
       html`<div @click="${() => this.deleteBlock(blockId)}" class="close">&times;</div>` : '';
@@ -309,5 +359,26 @@ export class BCDatalogPlayground extends LitElement {
         }
       >
       </bc-authorizer-editor>`;
+  }
+
+  renderToken() : TemplateResult {
+
+    let nonEmptyBlocks = this.blocks.slice(1).filter(({ code }) => code !== "");
+    nonEmptyBlocks = [this.blocks[0], ...nonEmptyBlocks];
+
+    const query = {
+      token_blocks: nonEmptyBlocks.map(({ code }) => code),
+      private_key: this.blocks[0].externalKey,
+      external_private_keys: nonEmptyBlocks.slice(1).map(
+        ({ externalKey }) => externalKey
+      ),
+    };
+
+    const {token, result} = token_from_query(query);
+
+    return html`<p>Token</p>
+    <div class="content">
+    <code>${token}</code>
+    </div>`
   }
 }
