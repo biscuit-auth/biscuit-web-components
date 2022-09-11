@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="/demo/index.css">
+  <script type="module" src="/src/index.ts"></script>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script type="application/javascript">
+    let appElement = document.querySelector("#app");
+
+    const search = window.location.search;
+
+    appElement.innerHTML = `<bc-playground-controls id="playground"
+      query="${search}"></bc-playground-controls>`
+
+    setTimeout(() => {
+        const playground = document.querySelector("#playground");
+        if (playground !== null) {
+            playground.addEventListener("export", (e) => {
+                let data = e.detail.url;
+
+                const old_location = window.location.toString();
+                const new_url = new URL(old_location)
+                new_url.search = data
+
+                window.history.pushState("", "", new_url.toString())
+            })
+        }
+    })
+</script>
+
+</body>
+</html>

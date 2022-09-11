@@ -19,6 +19,7 @@ export class BCDatalogPlayground extends LitElement {
   @property() displayFacts = false;
   @property() displayExport = false;
   @property() displayExternalKeys = false;
+  @property() displayToken = false;
   @property() allowCustomExternalKeys = false;
   @property() allowsRegenerate = "false";
   @state() code = "";
@@ -58,6 +59,21 @@ export class BCDatalogPlayground extends LitElement {
       max-width: 50%;
       padding: 10px;
       box-sizing: border-box;
+    }
+
+    .button {
+      padding: 5px;
+      box-sizing: border-box;
+      margin-top: -5px;
+    }
+    
+    .add_block {
+      font-size: 1.05em;
+      font-weight: bold;
+    }
+    
+    .key_details {
+      margin-top: -4px;
     }
   `;
 
@@ -128,6 +144,10 @@ export class BCDatalogPlayground extends LitElement {
       if (name === "allowsregenerate" && newval !== null) {
         this.allowsRegenerate = newval
       }
+
+      if (name === "displaytoken" && newval !== null) {
+          this.displayToken = newval  === "true"
+      }
   }
 
   // A new block is added to the chain
@@ -184,8 +204,19 @@ export class BCDatalogPlayground extends LitElement {
     this.requestUpdate("blocks");
   }
 
+    // Can be called from the outside of the component
+    askForExport(){
+        if (this.shadowRoot !== null) {
+            const exporter  = this.shadowRoot.querySelector("#export_button")
+            if (exporter) {
+                // @ts-ignore
+                exporter.performExport()
+            }
+        }
+    }
+
   //Export button pressed
-  onExport(e: CustomEvent) {
+  public onExport(e: CustomEvent) {
       const event = new CustomEvent("export", {
         detail: e.detail,
         bubbles: true,
@@ -257,14 +288,18 @@ export class BCDatalogPlayground extends LitElement {
 
     // Display export module
     const exportContent = html `
-      <bc-export @bc-export:export="${(e: CustomEvent) => this.onExport(e)}" code="${this.code}" .blocks="${this.blocks}"></bc-export>
+      <bc-export id="export_button" @bc-export:export="${(e: CustomEvent) => this.onExport(e)}" code="${this.code}" .blocks="${this.blocks}"></bc-export>
     `;
 
-    const exportComponent = this.displayExport ? exportContent : ``;
-    const token = this.renderToken()
+    const token = this.displayToken ? this.renderToken() : ``;
 
     return html`
-      ${exportComponent}
+      <style>
+        #export_button {
+          display: ${ this.displayExport ? "block" : "none"};
+        }
+      </style>
+      ${exportContent}
       ${this.renderBlocks(markers.blocks, parseErrors.blocks)}
       ${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}
       <p>Result</p>
@@ -289,7 +324,9 @@ export class BCDatalogPlayground extends LitElement {
       @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" 
       leftLabel="1st Party Block" 
       rightLabel="3rd Party Block" 
-      checked="${this.blocks[blockId].externalKey !== null ? "true" : "false"}"></bc-switch>` : ``;
+      ratio="1"
+      checked="${this.blocks[blockId].externalKey !== null ? "true" : "false"}"></bc-switch>
+    ` : ``;
 
     // Display the public key copy button, the private key input
     let blockDetails;
@@ -297,7 +334,8 @@ export class BCDatalogPlayground extends LitElement {
     // Blocks
     if (this.displayExternalKeys && blockId !== 0 &&
       this.blocks[blockId].externalKey !== null) {
-      blockDetails = html`<bc-key-details 
+      blockDetails = html`<bc-key-details
+        class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(blockId, e)}"
         .allowsCustomKey=${this.allowCustomExternalKeys} 
         privateKey="${this.blocks[blockId].externalKey}"></bc-key-details>`;
@@ -305,7 +343,8 @@ export class BCDatalogPlayground extends LitElement {
 
     // Authority
     if ( blockId === 0 && this.blocks[0].externalKey !== null) {
-      blockDetails = html`<bc-key-details 
+      blockDetails = html`<bc-key-details
+        class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(0, e)}"
         @bc-key-details:regenerate="${this.onRegeneratePrivateKey}"
         .allowsCustomKey=${this.allowCustomExternalKeys}
@@ -345,7 +384,7 @@ export class BCDatalogPlayground extends LitElement {
       ${this.blocks.map(({ code }, id) => {
         return this.renderBlock(id, code, markers[id], errors[id]);
       })}
-      <button @click=${this.addBlock}>Add block</button>
+      <button class="button add_block" @click=${this.addBlock}>+ Add block</button>
     `;
   }
 
@@ -364,6 +403,10 @@ export class BCDatalogPlayground extends LitElement {
 
   renderToken() : TemplateResult {
 
+    if (this.blocks.length === 0) {
+        return html``
+    }
+
     let nonEmptyBlocks = this.blocks.slice(1).filter(({ code }) => code !== "");
     nonEmptyBlocks = [this.blocks[0], ...nonEmptyBlocks];
 
@@ -375,7 +418,7 @@ export class BCDatalogPlayground extends LitElement {
       ),
     };
 
-    const {token, result} = token_from_query(query);
+    let {token} = token_from_query(query);
 
     return html`<p>Token</p>
     <div class="content">

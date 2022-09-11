@@ -7,24 +7,19 @@ import { dispatchCustomEvent } from "./lib/events";
 class BcSwitch extends LitElement {
   @property() leftLabel = "left"
   @property() rightLabel = "right"
+  @property() ratio = 1;
   @property() checked = false;
   @state() state = false;
 
   static styles = css`
-    :host {
-      --width : 30px;
-      --height: 17px;
-      --radius: 13px;
-      --padding: 2px;
-      --label-margin: 10px;
-      --color-right: #66B032;
-      --color-left: #9BD770;
-    }
-
     .container {
       position: relative;
       display: flex;
       flex-direction: row;
+    }
+    
+    .label {
+      line-height: var(--height);
     }
 
     .left {
@@ -116,9 +111,9 @@ class BcSwitch extends LitElement {
     }
 
     input:checked + .slider-green:before {
-      -webkit-transform: translateX(var(--radius));
-      -ms-transform: translateX(var(--radius));
-      transform: translateX(var(--radius));
+      -webkit-transform: translateX(calc(var(--width)/2 - var(--padding)));
+      -ms-transform: translateX(calc(var(--width)/2 - var(--padding)));
+      transform: translateX(calc(var(--width)/2 - var(--padding)));
     }
 
     /* Rounded sliders */
@@ -147,6 +142,10 @@ class BcSwitch extends LitElement {
     if (name === "leftlabel" && value !== null) {
       this.leftLabel = value
     }
+
+    if (name === "ratio" && value !== null) {
+        this.ratio = parseInt(value)
+    }
   }
 
   onSwitch(_e: Event) {
@@ -157,13 +156,24 @@ class BcSwitch extends LitElement {
   protected render() {
 
     return html`
+      <style>
+        :host {
+          --width : ${this.ratio * 30}px;
+          --height: ${this.ratio * 17}px;
+          --radius: ${this.ratio * 13}px;
+          --padding: ${this.ratio * 2}px;
+          --label-margin: ${this.ratio * 10}px;
+          --color-right: #66B032;
+          --color-left: #9BD770;
+        }
+      </style>
       <div class="container">
-        <div class="left">${this.leftLabel}</div>
+        <div class="left label">${this.leftLabel}</div>
         <label class="switch">
           <input @change="${this.onSwitch}" type="checkbox" .checked=${this.state}>
           <span class="slider-green round"></span>
         </label>
-        <div class="right">${this.rightLabel}</div>
+        <div class="right label">${this.rightLabel}</div>
       </div>
     `
   }

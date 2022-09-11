@@ -9,12 +9,20 @@ class BcExport extends LitElement {
 
   static styles = css`
     .container {
+      margin-top: 10px;
       margin-bottom: 10px;
       display: flex;
       gap: 10px;
     }
-    .confirmation {
+    .container .confirmation {
       display: none;
+    }
+
+    .container .export {
+      padding: 5px;
+      align-self: center;
+      font-weight: bold;
+      font-size: 1.05em;
     }
   `;
 
@@ -22,7 +30,7 @@ class BcExport extends LitElement {
     super();
   }
 
-  onClick() {
+  performExport() {
     const data = {code:this.code, blocks:this.blocks}
     const hash = encodeURIComponent(btoa(JSON.stringify(data)))
     dispatchCustomEvent(this, "export", {hash}, {bubble: true})
@@ -40,7 +48,7 @@ class BcExport extends LitElement {
   protected render(): unknown {
     return html`
       <div class="container">
-        <button @click="${this.onClick}">Export</button>
+        <button class="export" @click="${this.performExport}" type="button">Export Playground as hash</button>
         <div class="confirmation">Hash copied to clipboard and URL updated!</div>
       </div>
     `

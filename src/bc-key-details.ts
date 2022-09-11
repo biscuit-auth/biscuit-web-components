@@ -24,6 +24,34 @@ class ThirdPartyBlockDetails extends LitElement {
     .confirmation {
       display: none;
     }
+
+    .button {
+      padding: 5px;
+      box-sizing: border-box;
+      margin-top: -5px;
+      font-weight: bold;
+    }
+    
+    .key_container {
+      display: flex;
+      flex-direction: row;
+    }
+    
+    .key_container .symbol {
+      line-height: 20px;
+    }
+
+    .key_container .key {
+      line-height: 0;
+      margin-left: 2px;
+      user-select: all;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .key_container .key[contenteditable] {
+      outline: 0 solid transparent;
+    }
   `
 
   constructor() {
@@ -38,10 +66,10 @@ class ThirdPartyBlockDetails extends LitElement {
 
   onKeyChange(e: InputEvent) {
     if (e.target !== null ) {
-    const data = (e.target as HTMLInputElement).value;
-    this._privateKey = data;
-    this._publicKey = get_public_key(this._privateKey)
-    dispatchCustomEvent(this, "update", {data})
+        const data = (e.target as HTMLInputElement).innerText;
+        this._privateKey = data;
+        this._publicKey = get_public_key(this._privateKey)
+        dispatchCustomEvent(this, "update", {data})
     }
   }
 
@@ -86,16 +114,21 @@ class ThirdPartyBlockDetails extends LitElement {
 
   protected render() {
 
-    const customExternalKey = this.allowsCustomKey ? html`<input type="text" size="64" 
-                                                                 @blur="${(e: InputEvent) => this.onKeyChange(e)}"
-                                                                 value="${this._privateKey}"/>` : '';
+      const customExternalContent = html`<div class="key_container">
+        <div class="symbol">🔑</div>
+        <div contenteditable="true" class="key"
+             @blur="${(e: InputEvent) => this.onKeyChange(e)}"
+        >${this._privateKey}</div>
+      </div>`
 
-    const regenerate = this.allowsRegenerate ? html`<button @click="${this.onRegeneratePrivateKey}">Regenerate Private Key</button>` : ``;
+    const customExternalKey = this.allowsCustomKey ? customExternalContent : '';
+
+    const regenerate = this.allowsRegenerate ? html`<button class="button" @click="${this.onRegeneratePrivateKey}">Regenerate Private Key</button>` : ``;
 
     return html`
       <div class="container">
         ${regenerate}
-        <button @click="${this.onCopyButton}">Copy Public Key</button>
+        <button class="button" @click="${this.onCopyButton}" type="button">Copy Public Key</button>
         <div class="confirmation">Copied! </div>
         ${customExternalKey}
       </div>
