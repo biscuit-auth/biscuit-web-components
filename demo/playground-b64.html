@@ -27,10 +27,12 @@
   const customExternal = params.custom_external === '1';
   const regenerate = params.regenerate === '1';
   const blocks = params.blocks === '1';
+  const token = params.token === '1';
 
   appElement.innerHTML = `<bc-datalog-playground-b64 id="playground"
       displayExport="${exportState}"
       displayFacts="${factsState}"
+      displayToken="${token}"
       displayExternalKeys="${thirdParty}"
       allowCustomExternalKeys="${customExternal}"
       allowsRegenerate="${regenerate}"
@@ -64,6 +66,10 @@
         if (regenerate) {
           urlParams.set("regenerate", "1")
         }
+
+          if (token) {
+              urlParams.set("token", "1")
+          }
 
         urlParams.set("hash", data)
 

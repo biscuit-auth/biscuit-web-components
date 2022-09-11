@@ -56,9 +56,10 @@ export class BCDatalogPlayground extends LitElement {
 
     .content code {
       user-select: all;
-      max-width: 50%;
+      max-width: 100%;
       padding: 10px;
       box-sizing: border-box;
+      font-size: 1.2em;
     }
 
     .button {
@@ -70,6 +71,7 @@ export class BCDatalogPlayground extends LitElement {
     .add_block {
       font-size: 1.05em;
       font-weight: bold;
+      width: 100%;
     }
     
     .key_details {
@@ -210,7 +212,7 @@ export class BCDatalogPlayground extends LitElement {
             const exporter  = this.shadowRoot.querySelector("#export_button")
             if (exporter) {
                 // @ts-ignore
-                exporter.performExport()
+                exporter.performExport(true)
             }
         }
     }
@@ -297,6 +299,7 @@ export class BCDatalogPlayground extends LitElement {
       <style>
         #export_button {
           display: ${ this.displayExport ? "block" : "none"};
+          margin-bottom: 30px;
         }
       </style>
       ${exportContent}
