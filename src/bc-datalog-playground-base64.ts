@@ -310,6 +310,7 @@ export class BCDatalogPlayground extends LitElement {
         @bc-key-details:regenerate="${this.onRegeneratePrivateKey}"
         .allowsCustomKey=${this.allowCustomExternalKeys}
         allowsRegenerate=${this.allowsRegenerate}
+        withoutAlgorithm="true"
         privateKey="${this.blocks[0].externalKey}"></bc-key-details>`;
     }
 
