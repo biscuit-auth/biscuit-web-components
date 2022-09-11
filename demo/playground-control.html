@@ -29,9 +29,8 @@
                 new_url.search = data
 
                 let demo_url = new URL(new_url.toString())
-                demo_url.pathname = "/demo/playground-b64.html"
-
-                console.log(demo_url.toString())
+                demo_url.pathname = "/demo/playground-alternate.html"
+                
                 navigator.clipboard.writeText(demo_url.toString())
 
                 window.history.pushState("", "", new_url.toString())

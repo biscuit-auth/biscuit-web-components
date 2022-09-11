@@ -29,7 +29,7 @@
   const blocks = params.blocks === '1';
   const token = params.token === '1';
 
-  appElement.innerHTML = `<bc-datalog-playground-b64 id="playground"
+  appElement.innerHTML = `<bc-playground id="playground"
       displayExport="${exportState}"
       displayFacts="${factsState}"
       displayToken="${token}"
@@ -37,7 +37,7 @@
       allowCustomExternalKeys="${customExternal}"
       allowsRegenerate="${regenerate}"
       showBlocks="${blocks}"
-      fromHash="${hash}"></bc-datalog-playground-b64>`
+      fromHash="${hash}"></bc-playground>`
 
   setTimeout(() => {
     const playground = document.querySelector("#playground");

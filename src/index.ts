@@ -8,7 +8,7 @@ import "./bc-datalog-example.js";
 import "./bc-full-example.js";
 import "./bc-authorizer-result";
 import "./bc-datalog-playground";
-import "./bc-datalog-playground-base64";
+import "./bc-playground";
 import "./bc-playground-configurator";
 import "./bc-token-printer";
 import "./bc-token-generator";

@@ -12,7 +12,7 @@ import { token_from_query } from "./lib/token";
 /**
  * A fully tunable datalog biscuit playground
  */
-@customElement("bc-datalog-playground-b64")
+@customElement("bc-playground")
 export class BCDatalogPlayground extends LitElement {
   @property() fromHash = null;
   @property() showBlocks = false;

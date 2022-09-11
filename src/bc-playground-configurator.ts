@@ -1,14 +1,15 @@
 import { html, LitElement, css } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import "../src/bc-datalog-playground-base64";
-import { dispatchCustomEvent } from "./lib/events";
+import "../src/bc-playground";
+
+const EMPTY_PLAYGROUND = "eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D";
 
 @customElement("bc-playground-controls")
 class BcPlaygroundConfigurator extends LitElement {
 
     @property() query  = "";
 
-    @state() hash: string | null = "";
+    @state() hash: string | null = EMPTY_PLAYGROUND;
     @state() showBlocks = false;
     @state() displayFacts = false;
     @state() displayExport = false;
@@ -71,7 +72,7 @@ class BcPlaygroundConfigurator extends LitElement {
                 get: (searchParams, prop: string) => searchParams.get(prop),
             }) as URLSearchParams & Record<string, string>;
 
-            this.hash =  params.hash ? params.hash : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D';
+            this.hash =  params.hash ? params.hash : EMPTY_PLAYGROUND;
             this.displayExport = params.export === '1';
             this.displayExternalKeys = params.third_party === '1';
             this.displayToken = params.token === '1';
@@ -164,7 +165,7 @@ class BcPlaygroundConfigurator extends LitElement {
         <div class="container">
           <div id="playground">
             <div class="title">Playground</div>
-            <bc-datalog-playground-b64 id="playground-component"
+            <bc-playground id="playground-component"
               @export="${(e: CustomEvent) => this.onExport(e)}"
               displayExport="${this.displayExport}"
               displayFacts="${this.displayFacts}"
@@ -173,7 +174,7 @@ class BcPlaygroundConfigurator extends LitElement {
               allowCustomExternalKeys="${this.allowCustomExternalKeys}"
               allowsRegenerate="${this.allowsRegenerate}"
               showBlocks="${this.showBlocks}"
-              fromHash="${this.hash}"></bc-datalog-playground-b64>
+              fromHash="${this.hash}"></bc-playground>
           </div>
           <div id="controls">
             <div class="title">Controls</div>
