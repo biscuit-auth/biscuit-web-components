@@ -10,6 +10,7 @@ import { dispatchCustomEvent } from "./lib/events";
 class ThirdPartyBlockDetails extends LitElement {
   @property() privateKey = "";
   @property() allowsCustomKey = false;
+  @property() displayPublicKey = false;
   @property() withoutAlgorithm = false;
   @property() allowsRegenerate = false;
   @state() _privateKey = "";
@@ -90,6 +91,10 @@ class ThirdPartyBlockDetails extends LitElement {
     if (name === "allowsregenerate") {
       this.allowsRegenerate = value === "true"
     }
+
+    if (name === "displaypublickey") {
+      this.displayPublicKey = value === "true"
+    }
   }
 
   onCopyButton() {
@@ -124,12 +129,13 @@ class ThirdPartyBlockDetails extends LitElement {
     const customExternalKey = this.allowsCustomKey ? customExternalContent : '';
 
     const regenerate = this.allowsRegenerate ? html`<button class="button" @click="${this.onRegeneratePrivateKey}">Regenerate Private Key</button>` : ``;
+    const publicKey = this.displayPublicKey ? html`<button class="button" @click="${this.onCopyButton}" type="button">Copy Public Key</button>
+    <div class="confirmation">Copied! </div>` : ``;
 
     return html`
       <div class="container">
         ${regenerate}
-        <button class="button" @click="${this.onCopyButton}" type="button">Copy Public Key</button>
-        <div class="confirmation">Copied! </div>
+        ${publicKey}
         ${customExternalKey}
       </div>
     `;

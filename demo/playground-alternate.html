@@ -21,22 +21,30 @@
   });
 
   const hash = params.hash ? params.hash : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D'
-  const exportState = params.export === '1';
-  const thirdParty = params.third_party === '1';
-  const factsState = params.facts === '1';
-  const customExternal = params.custom_external === '1';
-  const regenerate = params.regenerate === '1';
-  const blocks = params.blocks === '1';
-  const token = params.token === '1';
+  const displayExport = params.export === '1';
+  const displayExternalKeys = params.third_party === '1';
+  const displayToken = params.token === '1';
+  const displayFacts = params.facts === '1';
+  const allowCustomExternalKeys = params.custom_external === '1';
+  const allowsRegenerate = params.regenerate === '1';
+  const showBlocks = params.blocks === '1';
+  const displayPublicKey = params.public_key === '1';
+  const displayResult = params.result === '1';
+  const displayAddBlock = params.add_block === '1';
+  const displayAuthorizer = params.authorizer === '1';
 
   appElement.innerHTML = `<bc-playground id="playground"
-      displayExport="${exportState}"
-      displayFacts="${factsState}"
-      displayToken="${token}"
-      displayExternalKeys="${thirdParty}"
-      allowCustomExternalKeys="${customExternal}"
-      allowsRegenerate="${regenerate}"
-      showBlocks="${blocks}"
+      displayExport="${displayExport}"
+      displayFacts="${displayFacts}"
+      displayToken="${displayToken}"
+      displayExternalKeys="${displayExternalKeys}"
+      allowCustomExternalKeys="${allowCustomExternalKeys}"
+      allowsRegenerate="${allowsRegenerate}"
+      showBlocks="${showBlocks}"
+      displayPublicKey="${displayPublicKey}"
+      displayResult="${displayResult}"
+      displayAddBlock="${displayAddBlock}"
+      displayAuthorizer="${displayAuthorizer}"
       fromHash="${hash}"></bc-playground>`
 
   setTimeout(() => {
@@ -45,31 +53,48 @@
       playground.addEventListener("export", (e) => {
         let data = e.detail.hash;
         let urlParams = new URLSearchParams();
-        if (exportState) {
+
+        if (displayExport) {
           urlParams.set("export", "1")
         }
-        if (blocks) {
+        if (showBlocks) {
           urlParams.set("blocks", "1")
         }
-        if (thirdParty) {
+        if (displayExternalKeys) {
           urlParams.set("third_party", "1")
         }
 
-        if (factsState) {
+        if (displayFacts) {
           urlParams.set("facts", "1")
         }
 
-        if (customExternal) {
+        if (allowCustomExternalKeys) {
           urlParams.set("custom_external", "1")
         }
 
-        if (regenerate) {
+        if (allowsRegenerate) {
           urlParams.set("regenerate", "1")
         }
 
-          if (token) {
-              urlParams.set("token", "1")
-          }
+        if (displayPublicKey) {
+            urlParams.set("public_key", "1")
+        }
+
+        if (displayResult) {
+            urlParams.set("result", "1")
+        }
+
+        if (displayAddBlock) {
+            urlParams.set("add_block", "1")
+        }
+
+        if (displayAuthorizer) {
+            urlParams.set("authorizer", "1")
+        }
+
+        if (token) {
+            urlParams.set("token", "1")
+        }
 
         urlParams.set("hash", data)
 

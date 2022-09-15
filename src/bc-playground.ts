@@ -20,8 +20,12 @@ export class BCDatalogPlayground extends LitElement {
   @property() displayExport = false;
   @property() displayExternalKeys = false;
   @property() displayToken = false;
+  @property() displayPublicKey = false;
+  @property() displayResult = false;
+  @property() displayAddBlock = false;
+  @property() displayAuthorizer = false;
   @property() allowCustomExternalKeys = false;
-  @property() allowsRegenerate = "false";
+  @property() allowsRegenerate = false;
   @state() code = "";
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
@@ -144,11 +148,27 @@ export class BCDatalogPlayground extends LitElement {
       }
 
       if (name === "allowsregenerate" && newval !== null) {
-        this.allowsRegenerate = newval
+        this.allowsRegenerate = newval === "true"
       }
 
       if (name === "displaytoken" && newval !== null) {
           this.displayToken = newval  === "true"
+      }
+
+      if (name === "displaypublickey" && newval !== null) {
+          this.displayPublicKey = newval  === "true"
+      }
+
+      if (name === "displayresult" && newval !== null) {
+        this.displayResult = newval  === "true"
+      }
+
+      if (name === "displayaddblock" && newval !== null) {
+        this.displayAddBlock = newval  === "true"
+      }
+
+      if (name === "displayauthorizer" && newval !== null) {
+        this.displayAuthorizer = newval  === "true"
       }
   }
 
@@ -295,6 +315,12 @@ export class BCDatalogPlayground extends LitElement {
 
     const token = this.displayToken ? this.renderToken() : ``;
 
+    const result = this.displayResult ? html`      <p>Result</p>
+    <bc-authorizer-result .content=${authorizer_result}>
+    </bc-authorizer-result>` : ``;
+
+    const authorizer = this.displayAuthorizer ? html`${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}` : ``;
+
     return html`
       <style>
         #export_button {
@@ -304,10 +330,8 @@ export class BCDatalogPlayground extends LitElement {
       </style>
       ${exportContent}
       ${this.renderBlocks(markers.blocks, parseErrors.blocks)}
-      ${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}
-      <p>Result</p>
-      <bc-authorizer-result .content=${authorizer_result}>
-      </bc-authorizer-result>
+      ${authorizer}
+      ${result}
       ${facts}
       ${token}
     `;
@@ -341,6 +365,7 @@ export class BCDatalogPlayground extends LitElement {
         class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(blockId, e)}"
         .allowsCustomKey=${this.allowCustomExternalKeys} 
+        .displayPublicKey=${true}
         privateKey="${this.blocks[blockId].externalKey}"></bc-key-details>`;
     }
 
@@ -350,13 +375,14 @@ export class BCDatalogPlayground extends LitElement {
         class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(0, e)}"
         @bc-key-details:regenerate="${this.onRegeneratePrivateKey}"
-        .allowsCustomKey=${this.allowCustomExternalKeys}
-        allowsRegenerate=${this.allowsRegenerate}
+        allowsCustomKey="${this.allowCustomExternalKeys}"
+        allowsRegenerate="${this.allowsRegenerate}"
+        displayPublicKey="${this.displayPublicKey}"
         withoutAlgorithm="true"
         privateKey="${this.blocks[0].externalKey}"></bc-key-details>`;
     }
 
-    const close = blockId !== 0 ?
+    const close = blockId !== 0 && this.displayAddBlock ?
       html`<div @click="${() => this.deleteBlock(blockId)}" class="close">&times;</div>` : '';
 
     return html`
@@ -383,17 +409,22 @@ export class BCDatalogPlayground extends LitElement {
   renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
     if (!this.showBlocks) return;
 
+    const addBlock = this.displayAddBlock ? html`<button class="button add_block" @click=${this.addBlock}>+ Add block</button>` : ``;
+
     return html`
       ${this.blocks.map(({ code }, id) => {
         return this.renderBlock(id, code, markers[id], errors[id]);
       })}
-      <button class="button add_block" @click=${this.addBlock}>+ Add block</button>
+      ${addBlock}
     `;
   }
 
   // Render the authorizer results and editor
   renderAuthorizer(markers: Array<CMMarker>, parseErrors: Array<CMError>) {
-    return html` <p>Authorizer</p>
+
+    const authorizer_title = this.showBlocks ? html`<p>Authorizer</p>` : ``;
+
+    return html`${authorizer_title}
       <bc-authorizer-editor
         code=${this.code}
         .markers=${markers ?? []}

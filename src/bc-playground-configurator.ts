@@ -16,7 +16,11 @@ class BcPlaygroundConfigurator extends LitElement {
     @state() displayToken = false;
     @state() displayExternalKeys = false;
     @state() allowCustomExternalKeys = false;
-    @state() allowsRegenerate = "false";
+    @state() allowsRegenerate = false;
+    @state() displayPublicKey = false;
+    @state() displayResult = false;
+    @state() displayAddBlock = false;
+    @state() displayAuthorizer = false;
 
 
     static styles = css`
@@ -78,8 +82,13 @@ class BcPlaygroundConfigurator extends LitElement {
             this.displayToken = params.token === '1';
             this.displayFacts = params.facts === '1';
             this.allowCustomExternalKeys = params.custom_external === '1';
-            this.allowsRegenerate = params.regenerate === '1' ? "true" : "false";
+            this.allowsRegenerate = params.regenerate === '1';
             this.showBlocks = params.blocks === '1';
+            this.displayPublicKey = params.public_key === '1';
+            this.displayResult = params.result === '1';
+            this.displayAddBlock = params.add_block === '1';
+            this.displayAuthorizer = params.authorizer === '1';
+
         }
     }
 
@@ -104,8 +113,20 @@ class BcPlaygroundConfigurator extends LitElement {
                 this.displayToken = state;
                 break
             case "regenerate":
-                this.allowsRegenerate = state ? "true" : "false";
+                this.allowsRegenerate = state;
                 break
+            case "public_key":
+                this.displayPublicKey = state;
+                break
+            case "result":
+              this.displayResult = state;
+              break
+            case "add_block":
+              this.displayAddBlock = state;
+              break
+            case "authorizer":
+              this.displayAuthorizer = state;
+              break
         }
     }
 
@@ -144,6 +165,26 @@ class BcPlaygroundConfigurator extends LitElement {
             urlParams.set("regenerate", "1")
         }
 
+        if (this.displayPublicKey) {
+          urlParams.set("public_key", "1")
+        }
+
+        if (this.displayResult) {
+          urlParams.set("result", "1")
+        }
+
+        if (this.displayAddBlock) {
+          urlParams.set("add_block", "1")
+        }
+
+        if (this.displayAuthorizer) {
+          urlParams.set("authorizer", "1")
+        }
+
+      if (this.displayPublicKey) {
+        urlParams.set("public_key", "1")
+      }
+
         if (this.displayToken) {
             urlParams.set("token", "1")
         }
@@ -173,6 +214,10 @@ class BcPlaygroundConfigurator extends LitElement {
               displayToken="${this.displayToken}"
               allowCustomExternalKeys="${this.allowCustomExternalKeys}"
               allowsRegenerate="${this.allowsRegenerate}"
+              displayPublicKey="${this.displayPublicKey}" 
+              displayResult="${this.displayResult}"
+              displayAddBlock="${this.displayAddBlock}"
+              displayAuthorizer="${this.displayAuthorizer}"          
               showBlocks="${this.showBlocks}"
               fromHash="${this.hash}"></bc-playground>
           </div>
@@ -184,7 +229,11 @@ class BcPlaygroundConfigurator extends LitElement {
             <bc-switch checked="${this.displayToken}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("token", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Display serialized token"></bc-switch>
             <bc-switch checked="${this.displayExternalKeys}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("third_party", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Allow 3rd party blocks"></bc-switch>
             <bc-switch checked="${this.allowCustomExternalKeys}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("custom_keys", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Allow to customize private keys"></bc-switch>
-            <bc-switch checked="${this.allowsRegenerate === "true"}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("regenerate", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Allow regenerate Biscuit private key"></bc-switch>
+            <bc-switch checked="${this.allowsRegenerate}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("regenerate", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Allow regenerate Biscuit private key"></bc-switch>
+            <bc-switch checked="${this.displayPublicKey}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("public_key", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Show public key button"></bc-switch>
+            <bc-switch checked="${this.displayResult}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("result", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Display Authorizer result"></bc-switch>
+            <bc-switch checked="${this.displayAddBlock}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("add_block", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Display Add Block button"></bc-switch>
+            <bc-switch checked="${this.displayAuthorizer}" @bc-switch:update="${(e: CustomEvent) => this.onSwitch("authorizer", e.detail.state)}" ratio="2" leftLabel="" rightLabel="Display Authorizer"></bc-switch>
             <button @click="${this.askPlaygroundHash}" class="export" type="button">Export</button>
           </div>
         </div>
