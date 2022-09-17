@@ -12,5 +12,6 @@ import "./bc-playground";
 import "./bc-playground-configurator";
 import "./bc-token-printer";
 import "./bc-token-generator";
+export {Configuration} from "./playground-configuration";
 export { execute } from "@biscuit-auth/biscuit-wasm-support";
 export { initialize } from "./wasm.js";
