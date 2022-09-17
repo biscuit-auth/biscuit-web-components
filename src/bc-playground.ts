@@ -8,6 +8,7 @@ import { initialize } from "./wasm.js";
 import { execute, generate_keypair } from "@biscuit-auth/biscuit-wasm-support";
 import { CMError, CMMarker, convertError, convertMarker, LibError, LibMarker } from "./lib/adapters";
 import { token_from_query } from "./lib/token";
+import {Configuration, ConfigurationEntry} from "./playground-configuration";
 
 /**
  * A fully tunable datalog biscuit playground
@@ -15,17 +16,16 @@ import { token_from_query } from "./lib/token";
 @customElement("bc-playground")
 export class BCDatalogPlayground extends LitElement {
   @property() fromHash = null;
-  @property() showBlocks = false;
-  @property() displayFacts = false;
-  @property() displayExport = false;
-  @property() displayExternalKeys = false;
-  @property() displayToken = false;
-  @property() displayPublicKey = false;
-  @property() displayResult = false;
-  @property() displayAddBlock = false;
-  @property() displayAuthorizer = false;
-  @property() allowCustomExternalKeys = false;
-  @property() allowsRegenerate = false;
+  @property({
+    converter: {
+      toAttribute(value: Configuration): string {
+        return value.toString()
+      },
+      fromAttribute(value: string): Configuration {
+        return Configuration.fromString(value)
+      }
+    }
+  }) configuration : Configuration;
   @state() code = "";
   @state() blocks: Array<{ code: string; externalKey: string | null }> = [];
   @state() private started = false;
@@ -85,6 +85,9 @@ export class BCDatalogPlayground extends LitElement {
 
   constructor() {
     super();
+
+    this.configuration = new Configuration();
+
     const codeChild = this.querySelector(".authorizer");
     if (codeChild !== null) {
       this.code = codeChild.textContent ?? "";
@@ -114,6 +117,9 @@ export class BCDatalogPlayground extends LitElement {
 
   // Triggered when attributes change
   attributeChangedCallback(name: string, oldval: string | null, newval: string | null) {
+
+    super.attributeChangedCallback(name, oldval, newval)
+
       if (name === "fromhash" && newval !== null) {
 
           const data = JSON.parse(atob(decodeURIComponent(newval)), function(k, v) {
@@ -126,54 +132,11 @@ export class BCDatalogPlayground extends LitElement {
           this.blocks = data.blocks;
           this.code = data.code;
       }
-
-      if (name === "showblocks") {
-          this.showBlocks = newval === "true";
-      }
-
-      if (name === "displayfacts") {
-          this.displayFacts = newval === "true";
-      }
-
-      if (name === "displayexternalkeys") {
-          this.displayExternalKeys = newval === "true";
-      }
-
-      if (name === "displayexport") {
-        this.displayExport = newval === "true";
-      }
-
-      if (name === "allowcustomexternalkeys") {
-        this.allowCustomExternalKeys = newval === "true"
-      }
-
-      if (name === "allowsregenerate" && newval !== null) {
-        this.allowsRegenerate = newval === "true"
-      }
-
-      if (name === "displaytoken" && newval !== null) {
-          this.displayToken = newval  === "true"
-      }
-
-      if (name === "displaypublickey" && newval !== null) {
-          this.displayPublicKey = newval  === "true"
-      }
-
-      if (name === "displayresult" && newval !== null) {
-        this.displayResult = newval  === "true"
-      }
-
-      if (name === "displayaddblock" && newval !== null) {
-        this.displayAddBlock = newval  === "true"
-      }
-
-      if (name === "displayauthorizer" && newval !== null) {
-        this.displayAuthorizer = newval  === "true"
-      }
   }
 
   // A new block is added to the chain
   addBlock() {
+
     const newBlocks = [...this.blocks];
     newBlocks.push({ code: "", externalKey: null });
     this.blocks = newBlocks;
@@ -306,25 +269,25 @@ export class BCDatalogPlayground extends LitElement {
         .content=${authorizer_world}
       ></bc-authorizer-content>`;
 
-    const facts = this.displayFacts ? factContent : html``;
+    const facts = this.configuration.get(ConfigurationEntry.facts) ? factContent : html``;
 
     // Display export module
     const exportContent = html `
       <bc-export id="export_button" @bc-export:export="${(e: CustomEvent) => this.onExport(e)}" code="${this.code}" .blocks="${this.blocks}"></bc-export>
     `;
 
-    const token = this.displayToken ? this.renderToken() : ``;
+    const token = this.configuration.get(ConfigurationEntry.token) ? this.renderToken() : ``;
 
-    const result = this.displayResult ? html`      <p>Result</p>
+    const result = this.configuration.get(ConfigurationEntry.result) ? html`      <p>Result</p>
     <bc-authorizer-result .content=${authorizer_result}>
     </bc-authorizer-result>` : ``;
 
-    const authorizer = this.displayAuthorizer ? html`${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}` : ``;
+    const authorizer = this.configuration.get(ConfigurationEntry.authorizer) ? html`${this.renderAuthorizer(markers.authorizer, parseErrors.authorizer)}` : ``;
 
     return html`
       <style>
         #export_button {
-          display: ${ this.displayExport ? "block" : "none"};
+          display: ${ this.configuration.get(ConfigurationEntry.export) ? "block" : "none"};
           margin-bottom: 30px;
         }
       </style>
@@ -346,7 +309,7 @@ export class BCDatalogPlayground extends LitElement {
   ) {
 
     // Display the toggle switch between 1st and 3rd party mode
-    const switchContent = this.displayExternalKeys && blockId !== 0 ? html`| 
+    const switchContent = this.configuration.get(ConfigurationEntry.third_party) && blockId !== 0 ? html`| 
     <bc-switch 
       @bc-switch:update="${(e: CustomEvent) => this.onBlockSwitch(blockId, e.detail.state)}" 
       leftLabel="1st Party Block" 
@@ -359,12 +322,12 @@ export class BCDatalogPlayground extends LitElement {
     let blockDetails;
 
     // Blocks
-    if (this.displayExternalKeys && blockId !== 0 &&
+    if (this.configuration.get(ConfigurationEntry.third_party) && blockId !== 0 &&
       this.blocks[blockId].externalKey !== null) {
       blockDetails = html`<bc-key-details
         class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(blockId, e)}"
-        .allowsCustomKey=${this.allowCustomExternalKeys} 
+        .allowsCustomKey=${this.configuration.get(ConfigurationEntry.custom_external)} 
         .displayPublicKey=${true}
         privateKey="${this.blocks[blockId].externalKey}"></bc-key-details>`;
     }
@@ -375,14 +338,14 @@ export class BCDatalogPlayground extends LitElement {
         class="key_details"
         @bc-key-details:update="${(e: CustomEvent) => this.onBlockKeyUpdate(0, e)}"
         @bc-key-details:regenerate="${this.onRegeneratePrivateKey}"
-        allowsCustomKey="${this.allowCustomExternalKeys}"
-        allowsRegenerate="${this.allowsRegenerate}"
-        displayPublicKey="${this.displayPublicKey}"
+        allowsCustomKey="${this.configuration.get(ConfigurationEntry.custom_external)}"
+        allowsRegenerate="${this.configuration.get(ConfigurationEntry.regenerate)}"
+        displayPublicKey="${this.configuration.get(ConfigurationEntry.public_key)}"
         withoutAlgorithm="true"
         privateKey="${this.blocks[0].externalKey}"></bc-key-details>`;
     }
 
-    const close = blockId !== 0 && this.displayAddBlock ?
+    const close = blockId !== 0 && this.configuration.get(ConfigurationEntry.add_block) ?
       html`<div @click="${() => this.deleteBlock(blockId)}" class="close">&times;</div>` : '';
 
     return html`
@@ -407,9 +370,10 @@ export class BCDatalogPlayground extends LitElement {
 
   // Render all block if needed
   renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
-    if (!this.showBlocks) return;
 
-    const addBlock = this.displayAddBlock ? html`<button class="button add_block" @click=${this.addBlock}>+ Add block</button>` : ``;
+    if (!this.configuration.get(ConfigurationEntry.blocks)) return;
+
+    const addBlock = this.configuration.get(ConfigurationEntry.add_block) ? html`<button class="button add_block" @click=${this.addBlock}>+ Add block</button>` : ``;
 
     return html`
       ${this.blocks.map(({ code }, id) => {
@@ -422,7 +386,7 @@ export class BCDatalogPlayground extends LitElement {
   // Render the authorizer results and editor
   renderAuthorizer(markers: Array<CMMarker>, parseErrors: Array<CMError>) {
 
-    const authorizer_title = this.showBlocks ? html`<p>Authorizer</p>` : ``;
+    const authorizer_title = this.configuration.get(ConfigurationEntry.blocks) ? html`<p>Authorizer</p>` : ``;
 
     return html`${authorizer_title}
       <bc-authorizer-editor
