@@ -411,7 +411,7 @@ export class BCDatalogPlayground extends LitElement {
     const query = {
       token_blocks: nonEmptyBlocks.map(({ code }) => code),
       private_key: this.blocks[0].externalKey,
-      external_private_keys: nonEmptyBlocks.slice(1).map(
+      external_private_keys: nonEmptyBlocks.map(
         ({ externalKey }) => externalKey
       ),
     };
