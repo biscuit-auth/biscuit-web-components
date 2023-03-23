@@ -110,11 +110,11 @@ const markField = StateField.define({
 });
 
 const successMark = Decoration.mark({
-  attributes: { style: "background: rgb(193, 241, 193)" },
+  attributes: { style: "background: var(--success-background);" },
 });
 
 const failureMark = Decoration.mark({
-  attributes: { style: "background: rgb(255, 162, 162)" },
+  attributes: { style: "background: var(--failure-background);" },
 });
 
 const parseErrorMark = Decoration.mark({
@@ -259,6 +259,8 @@ export class BcDatalogEditor extends LitElement {
           :host {
             background: #131314;
             color: #dee2e6;
+            --success-background: rgba(0, 255, 0, 0.3);
+            --failure-background: rgba(255, 0, 0, 0.5);
           }
 
           .ͼ2 .cm-gutters {
@@ -304,6 +306,8 @@ export class BcDatalogEditor extends LitElement {
           :host {
             background: #fff;
             color: #1d2d35;
+            --success-background: rgb(193, 241, 193);
+            --failure-background: rgb(255, 162, 162);
           }
         }
       `,
