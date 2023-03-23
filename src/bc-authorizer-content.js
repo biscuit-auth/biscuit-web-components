@@ -18,7 +18,7 @@ export class BcAuthorizerContent extends LitElement {
   render() {
     const deduped = [...new Set(this.content)];
     const sortedFacts = [...deduped].sort((f1, f2) => {
-      if (f1.name == f2.name) {
+      if (f1.name === f2.name) {
         return f1.terms > f2.terms ? 1 : -1;
       } else {
         return f1.name > f2.name ? 1 : -1;
@@ -29,13 +29,13 @@ export class BcAuthorizerContent extends LitElement {
     var facts = "";
     var current_name;
     for (let fact of sortedFacts) {
-      if (facts_map[fact.name] == undefined) {
+      if (facts_map[fact.name] === undefined) {
         facts_map[fact.name] = [];
       }
 
       let alreadyThere = false;
       for (let terms of facts_map[fact.name]) {
-        console.log(terms.join(), fact.terms.join());
+        console.debug(terms.join(), fact.terms.join());
         if (terms.join() === fact.terms.join()) {
           alreadyThere = true;
           break;
@@ -46,12 +46,11 @@ export class BcAuthorizerContent extends LitElement {
 
       facts_map[fact.name].push(fact.terms);
 
-      if (current_name == undefined) {
+      if (current_name === undefined) {
         current_name = fact.name;
       }
 
-      if (fact.name != current_name) {
-        facts += "\n";
+      if (fact.name !== current_name) {
         current_name = fact.name;
       }
 

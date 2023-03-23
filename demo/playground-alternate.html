@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Biscuit Playground</title>
+  <link rel="stylesheet" href="/demo/index.css">
+  <script type="module" src="/src/index.ts"></script>
+</head>
+<body>
+<h1>Biscuit Playground</h1>
+
+<div id="app"></div>
+
+<script type="application/javascript">
+  let appElement = document.querySelector("#app");
+
+  const params = new URLSearchParams(window.location.search);
+
+  import("/src/index.ts").then(m => {
+
+      let configuration = new m.Configuration();
+      configuration.fromUrl(params);
+
+      const hash = params.has("hash") ? params.get("hash") : 'eyJjb2RlIjoiIiwiYmxvY2tzIjpbeyJjb2RlIjoiIiwiZXh0ZXJuYWxLZXkiOm51bGx9XX0%3D'
+
+      appElement.innerHTML = `<bc-playground id="playground"
+      configuration=${configuration}
+      fromHash="${hash}"></bc-playground>`
+
+      setTimeout(() => {
+          const playground = document.querySelector("#playground");
+          if (playground !== null) {
+              playground.addEventListener("export", (e) => {
+                  let data = e.detail.hash;
+                  let urlParams = new URLSearchParams();
+                  configuration.exportUrl(urlParams);
+
+                  urlParams.set("hash", data)
+
+                  const old_location = window.location.toString();
+                  const new_url = new URL(old_location)
+                  new_url.search = urlParams.toString()
+
+                  window.history.pushState("", "", new_url.toString())
+              })
+          }
+      })
+
+  }).catch(e => {
+      console.log(e)
+  })
+
+
+</script>
+
+</body>
+</html>

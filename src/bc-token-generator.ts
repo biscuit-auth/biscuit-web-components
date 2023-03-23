@@ -7,6 +7,7 @@ import {
   generate_keypair,
 } from "@biscuit-auth/biscuit-wasm-support";
 import { LibError, Result, convertError, GeneratorError } from "./lib/adapters";
+import { token_from_query } from "./lib/token";
 
 /**
  * TODO DOCS
@@ -123,44 +124,7 @@ export class BcTokenGenerator extends LitElement {
       ),
     };
 
-    let result: Result<string, GeneratorError>;
-
-    try {
-      result = {
-        Ok: generate_token(query),
-      };
-    } catch (error) {
-      result = { Err: error as GeneratorError };
-    }
-
-    const blocksWithErrors: Array<number> = [];
-    (result.Err?.Parse?.blocks ?? []).forEach(
-      (errors: Array<LibError>, bId: number) => {
-        if (errors.length > 0) {
-          blocksWithErrors.push(bId);
-        }
-      }
-    );
-
-    let errorMessage = "Please correct the datalog input";
-
-    if (result.Err?.Biscuit === "InternalError") {
-      errorMessage = "Please provide an authority block";
-    } else if (
-      typeof result.Err?.Biscuit === "object" &&
-      result.Err?.Biscuit?.Format?.InvalidKeySize !== undefined
-    ) {
-      errorMessage = "Please enter (or generate) a valid private key";
-    } else if (blocksWithErrors.length > 0) {
-      const blockList = blocksWithErrors
-        .map((bId) => (bId === 0 ? "authority" : bId.toString()))
-        .join(", ");
-      errorMessage =
-        "Please correct the datalog input on the following blocks: " +
-        blockList;
-    }
-
-    const token = result.Ok ?? errorMessage;
+    const {token, result} = token_from_query(query);
 
     return html`
       <div class="row">

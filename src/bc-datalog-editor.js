@@ -205,8 +205,8 @@ export class BcDatalogEditor extends LitElement {
   }
 
   updated(changedProperties) {
-    console.log("updated");
-    console.log(changedProperties);
+    console.debug("updated");
+    console.debug(changedProperties);
     super.updated(changedProperties);
     if (changedProperties.has("datalog")) {
       if (this.datalog != this._cm.state.doc.toString()) {
