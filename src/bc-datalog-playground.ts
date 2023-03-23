@@ -27,12 +27,12 @@ export class BCDatalogPlayground extends LitElement {
 
     const codeChild = this.querySelector(".authorizer");
     if (codeChild !== null) {
-      this.code = codeChild.textContent ?? "";
+      this.code = trimLines(codeChild.textContent ?? "");
     }
     const blockChildren = this.querySelectorAll(".block");
     this.blocks = Array.from(blockChildren)
       .map((b, i) => {
-        const code = b.textContent ?? "";
+        const code = trimLines(b.textContent ?? "");
         let externalKey = null;
         if (i > 0) {
           externalKey = b.getAttribute("privateKey");
@@ -87,15 +87,12 @@ export class BCDatalogPlayground extends LitElement {
       authorizer: [],
     };
     if (this.started) {
-      const validBlocks = this.blocks.filter((x) => x.code !== "");
       const authorizerQuery = {
         token_blocks:
-          validBlocks.length > 0
-            ? validBlocks.map(({ code }) => code)
-            : ["check if true"],
+          this.blocks.length > 0 ? this.blocks.map(({ code }) => code) : [""],
         authorizer_code: this.code,
         query: "",
-        external_private_keys: validBlocks.map(
+        external_private_keys: this.blocks.map(
           ({ externalKey }) => externalKey
         ),
       };
@@ -148,10 +145,10 @@ export class BCDatalogPlayground extends LitElement {
     markers: Array<CMMarker>,
     errors: Array<CMError>
   ) {
-    return html`
-        <p>${
-          blockId == 0 ? "Authority block" : "Block " + blockId
-        }: ${this.renderExternalKeyInput(blockId)}</p>
+    return html` <p>
+        ${blockId == 0 ? "Authority block" : "Block " + blockId}:
+        ${this.renderExternalKeyInput(blockId)}
+      </p>
       <bc-datalog-editor
         datalog=${code}
         .markers=${markers ?? []}
@@ -160,7 +157,7 @@ export class BCDatalogPlayground extends LitElement {
           this.onUpdatedBlock(blockId, e)}
         }
       >
-      </bc-authorizer-editor>`;
+      </bc-datalog-editor>`;
   }
 
   renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
@@ -176,13 +173,20 @@ export class BCDatalogPlayground extends LitElement {
 
   renderAuthorizer(markers: Array<CMMarker>, parseErrors: Array<CMError>) {
     return html` <p>Authorizer</p>
-      <bc-authorizer-editor
-        code=${this.code}
+      <bc-datalog-editor
+        datalog=${this.code}
+        @bc-datalog-editor:update=${this.onUpdatedCode}
         .markers=${markers ?? []}
         .parseErrors=${parseErrors ?? []}
-        @bc-authorizer-editor:update=${this.onUpdatedCode}
-        }
       >
-      </bc-authorizer-editor>`;
+      </bc-datalog-editor>`;
   }
+}
+
+function trimLines(str: string) {
+  return str
+    .trim()
+    .split("\n")
+    .map((line: string) => line.trim())
+    .join("\n");
 }
