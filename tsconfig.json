@@ -3,7 +3,7 @@
     "target": "es2018",
     "module": "esnext",
     "moduleResolution": "node",
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "lib": ["es2017", "dom"],
     "declaration": true,
     "allowJs": true,
@@ -17,5 +17,5 @@
     "inlineSources": true,
     "rootDir": "./"
   },
-  "include": ["**/*.ts"]
+  "include": ["src/*.ts"]
 }

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>demo biscuit</title>
   <link rel="stylesheet" href="/demo/index.css">
-  <script src="/tree-sitter.js"></script>
+  <!-- <script src="/tree-sitter.js"></script> -->
   <script type="module" src="/src/bc-dl-editor.ts"></script>
 </head>
 <body>
@@ -17,15 +17,5 @@
   </code>
 </bc-dl-editor>
 
-<script>
-const Parser = window.TreeSitter;
-Parser.init().then(() => {
-  Parser.Language.load('/tree-sitter-biscuit.wasm').then((BiscuitDatalog) => {
-      window.Parser = Parser;
-      window.BiscuitParser = BiscuitDatalog;
-      console.log("loaded");
-  });
-})
-</script>
 </body>
 </html>

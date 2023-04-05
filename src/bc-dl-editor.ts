@@ -1,6 +1,7 @@
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { Parser, Language, Query, QueryCapture, Tree } from "../tree-sitter.js";
 
 const QUERY = `
 ;; Literals
@@ -66,19 +67,30 @@ const QUERY = `
   "||"
 ] @operator`;
 
+export interface Range {
+  name: string;
+  node: {
+    startIndex: number;
+    endIndex: number;
+  };
+}
+
 @customElement("bc-dl-editor")
 export class BcDlEditor extends LitElement {
   @property()
   code = "";
   @property()
-  marks = [];
+  marks: Range[] = [];
   @state()
-  _tree = null;
+  _tree: Tree | null = null;
   @state()
-  _captures = [];
+  _captures: QueryCapture[] = [];
 
-  _parser = null;
-  _query = null;
+  @state()
+  _parser: Parser | null = null;
+
+  @state()
+  _query: Query | null = null;
 
   constructor() {
     super();
@@ -89,51 +101,62 @@ export class BcDlEditor extends LitElement {
     }
   }
 
-  firstUpdated() {
-    super.firstUpdated();
+  connectedCallback() {
+    super.connectedCallback();
+    console.log("connected callback");
+    console.log("Parser initialized");
+    console.log(Language);
+    Language.load("/assets/tree-sitter-biscuit.wasm").then((BiscuitDatalog) => {
+      console.log("Language initialized");
+      const p = new Parser();
+      p.setLanguage(BiscuitDatalog);
+      this._query = BiscuitDatalog.query(QUERY);
+      this._parser = p;
+      this.handleInput(this.code);
+    });
+  }
+
+  firstUpdated(values: PropertyValues) {
+    super.firstUpdated(values);
     // trigger syntax highlighting for code provided as props
-    this.handleInput({ target: this.shadowRoot.querySelector("#editing") });
+    if (this.shadowRoot) {
+      this.handleInput(
+        (this.shadowRoot.querySelector("#editing") as HTMLInputElement).value
+      );
+    }
   }
 
-  ensureParser() {
-    if (this._parser !== null) return true;
-    if (window.Parser === undefined) return;
-    const p = new window.Parser();
-    p.setLanguage(window.BiscuitParser);
-    this._query = window.BiscuitParser.query(QUERY);
-    this._parser = p;
-    return true;
-  }
-
-  handleInput(e) {
-    if (this.ensureParser() !== true) return;
-    const code = e.target.value;
-    const tree = this._parser.parse(code);
-    const captures = this._query.captures(tree.rootNode);
-    this.code = code;
-    this._tree = tree;
-    this._captures = captures;
-    window.RRR = this._tree;
-    window.MMM = this._captures.map(
-      ({ name, node: { startIndex, endIndex } }) => [name, startIndex, endIndex]
-    );
+  handleInput(value: string | null) {
+    if (this._parser && this._query) {
+      const code = value ?? "";
+      const tree = this._parser.parse(code);
+      const captures = this._query.captures(tree.rootNode);
+      this.code = code;
+      this._tree = tree;
+      this._captures = captures;
+    }
     this.syncScroll();
-    console.log("done");
   }
 
   syncScroll() {
-    const textarea = this.shadowRoot.querySelector("#editing");
-    const highlighting = this.shadowRoot.querySelector("#highlighting");
-    highlighting.scrollTop = textarea.scrollTop;
-    highlighting.scrollLeft = textarea.scrollLeft;
+    if (this.shadowRoot) {
+      const textarea = this.shadowRoot.querySelector("#editing");
+      const highlighting = this.shadowRoot.querySelector("#highlighting");
+      if (textarea && highlighting) {
+        highlighting.scrollTop = textarea.scrollTop;
+        highlighting.scrollLeft = textarea.scrollLeft;
+      }
+    }
   }
 
   render() {
-    let rendered = this.renderText2(this.code, this._captures, this.marks);
+    console.log("rendering");
+    const rendered = this.renderText2(this.code, this._captures, this.marks);
     return html` <div id="wrapper">
       <textarea
         id="editing"
-        @input=${this.handleInput}
+        @input=${(e: InputEvent) =>
+          this.handleInput((e.target as HTMLInputElement)?.value)}
         spellcheck="false"
         @scroll=${this.syncScroll}
       >
@@ -146,7 +169,7 @@ ${this.code}</textarea
     </div>`;
   }
 
-  renderText2(text, captures, marks) {
+  renderText2(text: string, captures: Range[], marks: Range[]) {
     // captures come from tree-sitter and are assumed to be properly nested
     // (if nested at all, they are mostly contiguous).
     // marks however are user provided and completely separate from TS. so even
@@ -167,7 +190,7 @@ ${this.code}</textarea
 
     let output = "";
     // active ranges, indexed by their end index
-    let activeRanges = new Map();
+    const activeRanges = new Map();
     [...text].forEach((c, i) => {
       // every range is encoded as a span element, so there is no need
       // to care about the order, we only need to close the correct amount
@@ -183,7 +206,7 @@ ${this.code}</textarea
 
       // list of the ranges created by splitting opening ranges at the next
       // enclosing range end
-      let createdRanges = [];
+      const createdRanges: Range[] = [];
 
       // for each of the new ranges, make sure they are properly included in
       // the active ranges (ie they end before the next closing tag).
@@ -191,7 +214,7 @@ ${this.code}</textarea
       // and open them again. if the newly created range still intersects with
       // an already defined one, it will be handled at its starting index, so
       // we don't need to do further work here.
-      let openingAdapted = openingNow.map((r) => {
+      const openingAdapted = openingNow.map((r: Range) => {
         // since we're operating on shallow copies, mutating `r` directly
         // would mutate it everywhere else (including across) renders
         let adapted = r;
@@ -233,10 +256,10 @@ ${this.code}</textarea
       // position, we can sort them so that the widest ranges are opened first,
       // to let them contain smaller ranges
       openingAdapted
-        .sort((a, b) => {
+        .sort((a: Range, b: Range) => {
           return b.node.endIndex - a.node.endIndex;
         })
-        .forEach((r) => {
+        .forEach((r: Range) => {
           output += `<span class="${r.name.split(".").join(" ")}">`;
         });
 
@@ -266,10 +289,10 @@ ${this.code}</textarea
     // need to keep looking right until we find the last `</span>` tag, and
     // then inspect what's just before
     let offset = 0;
-    while (output.substr(offset - 7, 7) == "</span>") {
+    while (output.slice(offset - 7, 7) == "</span>") {
       offset -= 7;
     }
-    if (output.substr(offset - 4, 4) === "<br>") {
+    if (output.slice(offset - 4, 4) === "<br>") {
       output += " ";
     }
     return output;
@@ -306,10 +329,11 @@ ${this.code}</textarea
       position: relative;
       resize: vertical;
       z-index: 1;
+      min-height: 5em;
 
       color: transparent;
       background: transparent;
-      caret-color: black; /* Or choose your favorite color */
+      caret-color: var(--foreground); /* Or choose your favorite color */
     }
 
     #highlighting {
@@ -318,6 +342,7 @@ ${this.code}</textarea
       bottom: 3px;
       left: 0;
       z-index: 0;
+      color: var(--foreground);
       background-color: var(--background);
     }
 
@@ -343,40 +368,52 @@ ${this.code}</textarea
     .constant {
       color: var(--magenta);
     }
+
     .string {
       color: var(--green);
     }
+
     .comment {
       color: var(--gray);
       font-style: italic;
     }
+
     .variable {
       color: var(--foreground);
     }
+
     .punctuation {
       color: var(--foreground);
     }
+
     .keyword {
       color: var(--orange);
     }
+
     .operator {
       color: var(--orange);
     }
+
     .function {
       color: var(--yellow);
     }
+
     .warning {
       color: var(--yellow);
     }
+
     .mark.failure {
       background-color: var(--red-bg);
     }
+
     .mark.error {
       text-decoration: underline wavy var(--red);
     }
+
     .mark.success {
       background-color: var(--green-bg);
     }
+
     .hint {
       color: var(--blue);
       font-weight: bold;
