@@ -34,14 +34,21 @@ export class BcAuthorizerResult extends LitElement {
 
   renderResult() {
     const logicError = this.content?.Ok?.authorizer_result?.Err?.FailedLogic;
+    const parsingError = this.content?.Err?.token;
+    const publicKeyError = this.content?.Err?.root_key;
     const success = this.content?.Ok?.authorizer_result?.Ok !== undefined;
     if (success) {
       return html`<div><pre>Success</pre></div>`;
     } else if (logicError) {
       return this.renderLogicError(logicError);
+    } else if (publicKeyError) {
+      return html`<div><pre>Public key parsing error</pre></div>`;
+    } else if (parsingError) {
+      return html`<div><pre>Token parsing error</pre></div>`;
     } else if (this.content?.Err) {
       return html`<div><pre>Datalog execution error</pre></div>`;
     } else {
+      console.error(this.content);
       return html`<div><pre>Unknown error</pre></div>`;
     }
   }

@@ -49,6 +49,8 @@ export type Result<A, E> = {
 export type AuthorizerError = {
   authorizer: Array<LibError>;
   blocks: Array<Array<LibError>>;
+  root_key?: string;
+  token?: string;
 };
 
 export type Fact = {
