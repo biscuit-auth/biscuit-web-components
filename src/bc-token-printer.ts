@@ -193,9 +193,21 @@ export class BcTokenPrinter extends LitElement {
       </div>
       <div class="content">
         <p>Result</p>
-        <bc-authorizer-result .content=${result}> </bc-authorizer-result>
+        ${this.renderAuthorizerResult(result)}
       </div>
     `;
+  }
+
+  renderAuthorizerResult(result: Result<AuthorizerResult, AuthorizerError>) {
+    if (this.biscuit === "") {
+      return html`<div><pre>Please enter a base64-encoded token</pre></div>`;
+    }
+    if (this.rootPublicKey === "") {
+      return html`<div><pre>Please enter a public key</pre></div>`;
+    }
+    return html`<bc-authorizer-result
+      .content=${result}
+    ></bc-authorizer-result>`;
   }
 
   renderExtraBlock(
