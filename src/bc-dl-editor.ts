@@ -1,6 +1,7 @@
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { ifDefined} from "lit/directives/if-defined.js";
 import { Parser, Language, Query, QueryCapture, Tree } from "../tree-sitter.js";
 
 const QUERY = `
@@ -81,6 +82,8 @@ export class BcDlEditor extends LitElement {
   code = "";
   @property()
   marks: Range[] = [];
+  @property()
+  readonly: boolean = false;
   @state()
   _tree: Tree | null = null;
   @state()
@@ -155,6 +158,7 @@ export class BcDlEditor extends LitElement {
     return html` <div id="wrapper">
       <textarea
         id="editing"
+        readonly=${ifDefined(this.readonly ? "true" : undefined)}
         @input=${(e: InputEvent) =>
           this.handleInput((e.target as HTMLInputElement)?.value)}
         spellcheck="false"
