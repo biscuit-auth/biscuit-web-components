@@ -1,6 +1,6 @@
 import { css, html, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import "./bc-datalog-editor.js";
+import "./bc-datalog-editor";
 import { initialize } from "./wasm.js";
 import {
   generate_token,
@@ -101,8 +101,8 @@ export class BcTokenGenerator extends LitElement {
       <p>${blockId == 0 ? "Authority block" : "Block " + blockId}:</p>
       ${this.renderBlockKeyInput(blockId)}
       <bc-datalog-editor
-        code="${this._blocks[blockId] ?? ""}"
-        .parseErrors=${errors.map(convertError)}
+        code="${this._blocks[blockId]?.code ?? ""}"
+        .marks=${errors.map(convertError)}
         @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
           this._onUpdatedBlock(blockId, e)}
       >

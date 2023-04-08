@@ -1,7 +1,7 @@
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import { ifDefined} from "lit/directives/if-defined.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { Parser, Language, Query, QueryCapture, Tree } from "../tree-sitter.js";
 import { dispatchCustomEvent } from "./lib/events.js";
 
@@ -77,14 +77,14 @@ export interface Range {
   };
 }
 
-@customElement("bc-dl-editor")
-export class BcDlEditor extends LitElement {
+@customElement("bc-datalog-editor")
+export class BcDatalogEditor extends LitElement {
   @property()
   code = "";
   @property()
   marks: Range[] = [];
   @property()
-  readonly: boolean = false;
+  readonly = false;
   @state()
   _tree: Tree | null = null;
   @state()
@@ -130,6 +130,14 @@ export class BcDlEditor extends LitElement {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+    super.attributeChangedCallback(name, oldValue, newValue);
+    if (name === "code" && oldValue != newValue) {
+      this.handleInput(newValue);
+    }
+  }
+
   handleInput(value: string | null) {
     if (this._parser && this._query) {
       const code = value ?? "";
@@ -138,6 +146,7 @@ export class BcDlEditor extends LitElement {
       this.code = code;
       this._tree = tree;
       this._captures = captures;
+      this.code = code;
     }
     this.syncScroll();
   }
@@ -163,8 +172,9 @@ export class BcDlEditor extends LitElement {
         @input=${(e: InputEvent) => {
           const code = (e.target as HTMLInputElement)?.value;
           this.handleInput(code);
-          dispatchCustomEvent(this, "update", {code});
+          dispatchCustomEvent(this, "update", { code });
         }}
+        @keydown=${(e: Event) => e.stopPropagation()}
         spellcheck="false"
         @scroll=${this.syncScroll}
       >

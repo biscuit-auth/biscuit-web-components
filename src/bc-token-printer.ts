@@ -1,6 +1,6 @@
 import { css, html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import "./bc-datalog-editor.js";
+import "./bc-datalog-editor";
 import { initialize } from "./wasm.js";
 import {
   execute_serialized,
@@ -155,8 +155,8 @@ export class BcTokenPrinter extends LitElement {
           block.external_key ?? "n/a"
         }</span></p>
         <bc-datalog-editor
-          datalog=${block.code}
-          .markers=${blockMarkers[index] ?? []}
+          code=${block.code}
+          .marks=${blockMarkers[index] ?? []}
           readonly="true"
         </bc-datalog-editor>
         </div>
@@ -207,7 +207,7 @@ export class BcTokenPrinter extends LitElement {
       <p>${"Block " + (blocksOffset + blockId)}:</p>
       <bc-datalog-editor
         code="${this.extraBlocks[blockId] ?? ""}"
-        .parseErrors=${errors.map(convertError)}
+        .marks=${errors.map(convertError)}
         @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
           this._onUpdatedExtraBlock(blockId, e)}
       >

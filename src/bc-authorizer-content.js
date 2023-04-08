@@ -59,7 +59,7 @@ export class BcAuthorizerContent extends LitElement {
     }
 
     return html` <div>
-      <bc-datalog-editor datalog=${facts} readonly="true"></bc-datalog-editor>
+      <bc-datalog-editor code=${facts} readonly="true"></bc-datalog-editor>
     </div>`;
   }
 

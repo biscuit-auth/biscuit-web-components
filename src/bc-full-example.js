@@ -152,9 +152,8 @@ export class BcFullExample extends LitElement {
           (block, index) => html`
             <p>Block ${index}</p>
             <bc-datalog-editor
-              datalog=${block.code}
-              parseErrors="${JSON.stringify(blockParseErrors[index])}"
-              markers="${JSON.stringify(blockMarkers[index])}"
+              code=${block.code}
+              .marks=${blockMarkers[index].concat(blockParseErrors[index])}
               @bc-datalog-editor:update="${(e) => {
                 this._onUpdatedBlock(index, e.detail.code);
               }}"
