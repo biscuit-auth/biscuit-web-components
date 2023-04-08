@@ -131,3 +131,11 @@ export type AttenuactionError = {
     blocks: Array<Array<LibError>>;
   };
 };
+
+export function trimLines(str: string) {
+  return str
+    .trim()
+    .split("\n")
+    .map((line: string) => line.trim())
+    .join("\n");
+}

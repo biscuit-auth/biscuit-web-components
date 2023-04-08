@@ -6,7 +6,13 @@ import {
   generate_token,
   generate_keypair,
 } from "@biscuit-auth/biscuit-wasm-support";
-import { LibError, Result, convertError, GeneratorError } from "./lib/adapters";
+import {
+  LibError,
+  Result,
+  convertError,
+  GeneratorError,
+  trimLines,
+} from "./lib/adapters";
 
 /**
  * TODO DOCS
@@ -25,6 +31,23 @@ export class BcTokenGenerator extends LitElement {
 
   @state()
   _started = false;
+
+  constructor() {
+    super();
+    console.log("constructor");
+    const blockChildren = this.querySelectorAll(".block");
+    console.log({ blockChildren });
+    this._blocks = Array.from(blockChildren)
+      .map((b, i) => {
+        const code = trimLines(b.textContent ?? "");
+        let externalKey = null;
+        if (i > 0) {
+          externalKey = b.getAttribute("privateKey");
+        }
+        return { code, externalKey };
+      })
+      .filter(({ code }, i) => i === 0 || code !== "");
+  }
 
   firstUpdated() {
     initialize().then(() => (this._started = true));

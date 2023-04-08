@@ -6,6 +6,7 @@ import { execute } from "@biscuit-auth/biscuit-wasm-support";
 import {
   convertMarker,
   convertError,
+  trimLines,
   LibMarker,
   LibError,
 } from "./lib/adapters";
@@ -177,12 +178,4 @@ export class BCDatalogPlayground extends LitElement {
       >
       </bc-datalog-editor>`;
   }
-}
-
-function trimLines(str: string) {
-  return str
-    .trim()
-    .split("\n")
-    .map((line: string) => line.trim())
-    .join("\n");
 }
