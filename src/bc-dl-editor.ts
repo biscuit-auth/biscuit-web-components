@@ -3,6 +3,7 @@ import { customElement, property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { ifDefined} from "lit/directives/if-defined.js";
 import { Parser, Language, Query, QueryCapture, Tree } from "../tree-sitter.js";
+import { dispatchCustomEvent } from "./lib/events.js";
 
 const QUERY = `
 ;; Literals
@@ -159,8 +160,11 @@ export class BcDlEditor extends LitElement {
       <textarea
         id="editing"
         readonly=${ifDefined(this.readonly ? "true" : undefined)}
-        @input=${(e: InputEvent) =>
-          this.handleInput((e.target as HTMLInputElement)?.value)}
+        @input=${(e: InputEvent) => {
+          const code = (e.target as HTMLInputElement)?.value;
+          this.handleInput(code);
+          dispatchCustomEvent(this, "update", {code});
+        }}
         spellcheck="false"
         @scroll=${this.syncScroll}
       >
