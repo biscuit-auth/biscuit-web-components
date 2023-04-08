@@ -143,7 +143,6 @@ export class BcDatalogEditor extends LitElement {
       const code = value ?? "";
       const tree = this._parser.parse(code);
       const captures = this._query.captures(tree.rootNode);
-      this.code = code;
       this._tree = tree;
       this._captures = captures;
       this.code = code;
@@ -163,11 +162,12 @@ export class BcDatalogEditor extends LitElement {
   }
 
   render() {
-    console.log("rendering");
     const rendered = this.renderText2(this.code, this._captures, this.marks);
-    return html` <div id="wrapper">
+    const rows = Math.max(this.code.split("\n").length, 1);
+    return html`<div id="wrapper">
       <textarea
         id="editing"
+        rows=${rows}
         readonly=${ifDefined(this.readonly ? "true" : undefined)}
         @input=${(e: InputEvent) => {
           const code = (e.target as HTMLInputElement)?.value;
@@ -349,6 +349,7 @@ ${this.code}</textarea
       z-index: 1;
       min-height: 5em;
 
+      white-space: pre;
       color: transparent;
       background: transparent;
       caret-color: var(--foreground); /* Or choose your favorite color */
