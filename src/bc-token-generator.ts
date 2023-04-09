@@ -1,10 +1,11 @@
 import { css, html, LitElement } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import "./bc-datalog-editor";
 import { initialize } from "./wasm.js";
 import {
   generate_token,
   generate_keypair,
+  get_public_key,
 } from "@biscuit-auth/biscuit-wasm-support";
 import {
   LibError,
@@ -19,15 +20,11 @@ import {
  */
 @customElement("bc-token-generator")
 export class BcTokenGenerator extends LitElement {
-  @state()
-  _privateKey = "";
-  @state()
-  _publicKey = "";
+  @property()
+  privateKey = "";
 
   @state()
-  _blocks: Array<{ code: string; externalKey: string | null }> = [
-    { code: "", externalKey: null },
-  ];
+  _blocks: Array<{ code: string; externalKey: string | null }> = [];
 
   @state()
   _started = false;
@@ -47,6 +44,9 @@ export class BcTokenGenerator extends LitElement {
         return { code, externalKey };
       })
       .filter(({ code }, i) => i === 0 || code !== "");
+    if (this._blocks.length === 0) {
+      this._blocks = [{ code: "", externalKey: null }];
+    }
   }
 
   firstUpdated() {
@@ -72,9 +72,8 @@ export class BcTokenGenerator extends LitElement {
   }
 
   generateKey() {
-    const { public_key, private_key } = generate_keypair();
-    this._privateKey = private_key;
-    this._publicKey = public_key;
+    const { private_key } = generate_keypair();
+    this.privateKey = private_key;
   }
 
   addBlock() {
@@ -92,18 +91,14 @@ export class BcTokenGenerator extends LitElement {
   }
 
   renderKeyInput() {
+    const publicKey = this.privateKey && get_public_key(this.privateKey);
     return html`
       <div class="row">
         <p>
           <label for="private-key">Private key</label>
-          <input id="private-key" value="${this._privateKey}" /><br />
+          <input id="private-key" value="${this.privateKey}" /><br />
           <label for="public-key">Public key</label>
-          <input
-            id="public-key"
-            value="${this._publicKey}"
-            readonly
-            disabled
-          /><br />
+          <input id="public-key" value="${publicKey}" readonly disabled /><br />
           <button @click=${this.generateKey}>Generate key</button>
         </p>
       </div>
@@ -140,7 +135,7 @@ export class BcTokenGenerator extends LitElement {
 
     const query = {
       token_blocks: nonEmptyBlocks.map(({ code }) => code),
-      private_key: this._privateKey,
+      private_key: this.privateKey,
       external_private_keys: nonEmptyBlocks.map(
         ({ externalKey }) => externalKey
       ),

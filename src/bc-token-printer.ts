@@ -15,6 +15,7 @@ import {
   Result,
   convertMarker,
   convertError,
+  trimLines,
 } from "./lib/adapters";
 
 /**
@@ -50,7 +51,7 @@ export class BcTokenPrinter extends LitElement {
     super();
     const authorizerChild = this.querySelector(".authorizer");
     if (authorizerChild !== null) {
-      this.authorizer = authorizerChild.textContent?.trim() ?? "";
+      this.authorizer = trimLines(authorizerChild.textContent ?? "");
     }
   }
 
