@@ -437,6 +437,61 @@ ${this.code}</textarea
       color: var(--blue);
       font-weight: bold;
     }
+
+    @media (prefers-color-scheme: dark) {
+      :host {
+        --background: #0f1419;
+        --foreground: #bfbdb6;
+        --black: #131721;
+        --blue: #59c2ff;
+        --dark_gray: #2d3640;
+        --cyan: #73b8ff;
+        --gray: #5c6773;
+        --green: #aad94c;
+        --green-bg: rgba(170, 217, 76, 0.5);
+        --magenta: #d2a6ff;
+        --orange: #ff8f40;
+        --red: #f07178;
+        --red-bg: rgba(240, 113, 120, 0.5);
+        --yellow: #e6b450;
+      }
+      .comment {
+        color: var(--gray);
+        text-transform: italic;
+      }
+      .error {
+        color: var(--red);
+        font-weight: bold;
+      }
+      .hint {
+        color: var(--blue);
+        font-weight: bold;
+      }
+      .constant {
+        color: var(--magenta);
+      }
+      .function {
+        color: var(--yellow);
+      }
+      .keyword {
+        color: var(--orange);
+      }
+      .operator {
+        color: var(--orange);
+      }
+      .punctuation {
+        color: var(--foreground);
+      }
+      .string {
+        color: var(--green);
+      }
+      .variable {
+        color: var(--foreground);
+      }
+      .warning {
+        color: var(--yellow);
+      }
+    }
   `;
 }
 
