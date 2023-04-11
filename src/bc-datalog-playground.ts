@@ -1,14 +1,13 @@
 import { html, LitElement } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import "./bc-datalog-editor.js";
+import { Range } from "./bc-datalog-editor";
 import { initialize } from "./wasm.js";
 import { execute } from "@biscuit-auth/biscuit-wasm-support";
 import {
   convertMarker,
   convertError,
+  trimLines,
   LibMarker,
-  CMError,
-  CMMarker,
   LibError,
 } from "./lib/adapters";
 
@@ -142,17 +141,16 @@ export class BCDatalogPlayground extends LitElement {
   renderBlock(
     blockId: number,
     code: string,
-    markers: Array<CMMarker>,
-    errors: Array<CMError>
+    markers: Array<Range> = [],
+    errors: Array<Range> = []
   ) {
     return html` <p>
         ${blockId == 0 ? "Authority block" : "Block " + blockId}:
         ${this.renderExternalKeyInput(blockId)}
       </p>
       <bc-datalog-editor
-        datalog=${code}
-        .markers=${markers ?? []}
-        .parseErrors=${errors ?? []}
+        code=${code}
+        .marks=${markers.concat(errors)}
         @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
           this.onUpdatedBlock(blockId, e)}
         }
@@ -160,7 +158,7 @@ export class BCDatalogPlayground extends LitElement {
       </bc-datalog-editor>`;
   }
 
-  renderBlocks(markers: Array<Array<CMMarker>>, errors: Array<Array<CMError>>) {
+  renderBlocks(markers: Array<Array<Range>>, errors: Array<Array<Range>>) {
     if (!this.showBlocks) return;
 
     return html`
@@ -171,22 +169,13 @@ export class BCDatalogPlayground extends LitElement {
     `;
   }
 
-  renderAuthorizer(markers: Array<CMMarker>, parseErrors: Array<CMError>) {
+  renderAuthorizer(markers: Array<Range>, parseErrors: Array<Range>) {
     return html` <p>Authorizer</p>
       <bc-datalog-editor
-        datalog=${this.code}
+        code=${this.code}
         @bc-datalog-editor:update=${this.onUpdatedCode}
-        .markers=${markers ?? []}
-        .parseErrors=${parseErrors ?? []}
+        .marks=${markers.concat(parseErrors)}
       >
       </bc-datalog-editor>`;
   }
-}
-
-function trimLines(str: string) {
-  return str
-    .trim()
-    .split("\n")
-    .map((line: string) => line.trim())
-    .join("\n");
 }

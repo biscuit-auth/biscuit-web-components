@@ -148,7 +148,7 @@ function setParseErrorMark(view, start, end) {
 /**
  * TODO DOCS
  */
-export class BcDatalogEditor extends LitElement {
+export class BcDatalogEditorLegacy extends LitElement {
   static get properties() {
     return {
       readonly: { type: Boolean },
@@ -323,4 +323,4 @@ function htmlEntities(str) {
     .replace(/&quot;/g, '"');
 }
 
-window.customElements.define("bc-datalog-editor", BcDatalogEditor);
+window.customElements.define("bc-datalog-editor-legacy", BcDatalogEditorLegacy);

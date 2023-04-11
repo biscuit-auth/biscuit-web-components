@@ -1,5 +1,5 @@
 import { css, html, LitElement } from "lit";
-import "./bc-datalog-editor.js";
+import "./bc-datalog-editor";
 import { dispatchCustomEvent } from "../src/lib/events.js";
 
 /**
@@ -54,9 +54,8 @@ export class BcTokenEditor extends LitElement {
             remove this block
           </button>
           <bc-datalog-editor
-            datalog=${block.code}
-            parseErrors="${JSON.stringify(this.parseErrors[index])}"
-            markers="${JSON.stringify(this.markers[index])}"
+            code=${block.code}
+            .marks=${this.markers[index].concat(this.parseErrors[index])}
             @bc-datalog-editor:update="${(e) => {
               this._onUpdatedCode(block, e.detail.code);
             }}"

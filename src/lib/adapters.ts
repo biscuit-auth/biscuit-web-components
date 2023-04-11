@@ -12,11 +12,22 @@ export type CMMarker = {
   ok: boolean;
 };
 
-export const convertMarker = (marker: LibMarker) => {
+export const convertMarkerLegacy = (marker: LibMarker) => {
   return {
     start: marker.position.start,
     end: marker.position.end,
     ok: marker.ok,
+  };
+};
+
+export const convertMarker = (marker: LibMarker) => {
+  console.log({ marker });
+  return {
+    name: marker.ok ? "mark.success" : "mark.failure",
+    node: {
+      startIndex: marker.position.start,
+      endIndex: marker.position.end,
+    },
   };
 };
 
@@ -32,12 +43,31 @@ export type CMError = {
   end: number;
 };
 
-export const convertError = (error: LibError) => {
+export const convertErrorLegacy = (error: LibError) => {
   return {
     message: error.message,
     severity: "error",
     start: error.position.start,
     end: error.position.end,
+  };
+};
+
+export const convertError = (error: LibError) => {
+  console.log({ error });
+  return {
+    name: "mark.error",
+    node: {
+      startIndex: error.position.start,
+      endIndex: error.position.end,
+    },
+  };
+};
+
+export type Range = {
+  name: string;
+  node: {
+    startIndex: number;
+    endIndex: number;
   };
 };
 
@@ -103,3 +133,11 @@ export type AttenuactionError = {
     blocks: Array<Array<LibError>>;
   };
 };
+
+export function trimLines(str: string) {
+  return str
+    .trim()
+    .split("\n")
+    .map((line: string) => line.trim())
+    .join("\n");
+}
