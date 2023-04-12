@@ -323,10 +323,10 @@ ${this.code}</textarea
 
     #editing,
     #highlighting {
-      margin: 10px;
+      margin: 0;
       padding: 10px;
       border: 0;
-      width: calc(100% - 32px);
+      width: calc(100% - 22px);
       overflow: auto;
       white-space: nowrap;
     }
@@ -334,9 +334,9 @@ ${this.code}</textarea
     #editing,
     #highlighting,
     #highlighting * {
-      font-size: 15pt;
+      font-size: var(--editor-font, 13px);
       font-family: monospace;
-      line-height: 20pt;
+      line-height: calc(var(--editor-font, 13px) * 1.3);
     }
 
     #highlighting {
