@@ -8,7 +8,7 @@
     "dist/"
   ],
   "author": "Geoffroy Couprie",
-  "version": "0.5.0-alpha1",
+  "version": "0.5.0-alpha2",
   "scripts": {
     "start": "wds --node-resolve --open demo/",
     "serve": "wds --node-resolve --open demo/ --watch",
