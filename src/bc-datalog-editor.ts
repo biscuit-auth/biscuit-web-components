@@ -196,7 +196,7 @@ export class BcDatalogEditor extends LitElement {
       } while (res !== -1);
     }
 
-    const rendered = this.renderText2(
+    const rendered = this.renderText(
       this.code,
       this._captures,
       this.marks,
@@ -227,7 +227,7 @@ ${this.code}</textarea
     </div>`;
   }
 
-  renderText2(
+  renderText(
     text: string,
     captures: Range[],
     marks: Range[],
