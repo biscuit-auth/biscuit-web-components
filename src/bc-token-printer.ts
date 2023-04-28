@@ -256,12 +256,17 @@ export class BcTokenPrinter extends LitElement {
         blockList;
     }
 
-    const attenuated = result.Ok ?? errorMessage;
+    let attenuated;
+    if (this.biscuit == "") {
+      attenuated = html`Please enter a base64-encoded token`;
+    } else {
+      attenuated = result.Ok ?? errorMessage;
+    }
 
     return html`
       <div class="code">
         <p>Extra blocks</p>
-        ${this.extraBlocks.map((code, id) => {
+        ${this.extraBlocks.map((_, id) => {
           const blockErrors = result.Err?.BlockParseErrors?.blocks[id] ?? [];
           return this.renderExtraBlock(id, blockErrors, blocksOffset);
         })}
