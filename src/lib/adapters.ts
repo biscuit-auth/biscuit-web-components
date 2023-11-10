@@ -141,3 +141,15 @@ export function trimLines(str: string) {
     .map((line: string) => line.trim())
     .join("\n");
 }
+
+export type SnapshotInspectionResult = {
+  snapshot: Result<SnapshotData, LogicError>;
+};
+
+export type SnapshotData = {
+  code: string;
+  iterations: number;
+  elapsed_micros: bigint;
+  authorization_result: Result<number, { FailedLogic?: LogicError }>;
+  query_result?: Result<Array<Fact>, LogicError>;
+};
