@@ -149,7 +149,7 @@ export type SnapshotInspectionResult = {
 export type SnapshotData = {
   code: string;
   iterations: number;
-  elapsed_micros: bigint;
+  elapsed_micros?: bigint;
   authorization_result: Result<number, { FailedLogic?: LogicError }>;
   query_result?: Result<Array<Fact>, LogicError>;
 };

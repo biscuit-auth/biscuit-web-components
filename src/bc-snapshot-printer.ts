@@ -25,9 +25,6 @@ export class BcSnapshotPrinter extends LitElement {
   readonly = false;
 
   @property()
-  showAuthorizer = false;
-
-  @property()
   showQuery = false;
 
   @property()
@@ -59,11 +56,6 @@ export class BcSnapshotPrinter extends LitElement {
   _onUpdatedQuery(e: { detail: { code: string } }) {
     if (!this.showQuery) return;
     this.query = e.detail.code;
-  }
-
-  _onUpdatedAuthorizer(e: { detail: { code: string } }) {
-    if (!this.showAuthorizer) return;
-    this.authorizer = e.detail.code;
   }
 
   renderSnapshotInput() {
@@ -134,12 +126,11 @@ export class BcSnapshotPrinter extends LitElement {
     return html`
       ${this.renderSnapshotInput()}
       <div class="content">
-        <p>Elapsed time: ${elapsed_micros.toString()}μs</p>
+        <p>Elapsed time: ${this.renderDuration(elapsed_micros)}</p>
         <p>Iterations: ${iterations}</p>
         <p>Snapshot contents</p>
         <bc-datalog-editor code=${code} .marks=${[]} readonly="true">
         </bc-datalog-editor>
-        ${this.renderAuthorizerInput()}
         <bc-authorizer-result .content=${auth_res}></bc-authorizer-result>
         ${this.renderQueryInput()}
         ${query_result && this.renderQueryResult(query_result)}
@@ -147,17 +138,12 @@ export class BcSnapshotPrinter extends LitElement {
     `;
   }
 
-  renderAuthorizerInput() {
-    if (!this.showAuthorizer) return;
+  renderDuration(micros?: bigint) {
+    if (micros === undefined) {
+      return "n/a";
+    }
 
-    return html`
-      <p>Extra authorizer code</p>
-      <bc-datalog-editor
-        @bc-datalog-editor:update=${(e: { detail: { code: string } }) =>
-          this._onUpdatedAuthorizer(e)}
-      >
-      </bc-datalog-editor>
-    `;
+    return `${micros}μs`;
   }
 
   renderQueryInput() {

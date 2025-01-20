@@ -5,6 +5,7 @@ import { initialize } from "./wasm.js";
 import {
   generate_token,
   generate_keypair,
+  generate_ecdsa_keypair,
   get_public_key,
 } from "@biscuit-auth/biscuit-wasm-support";
 import {
@@ -22,6 +23,9 @@ import {
 export class BcTokenGenerator extends LitElement {
   @property()
   privateKey = "";
+
+  @state()
+  _alg = "ed25519";
 
   @state()
   _blocks: Array<{ code: string; externalKey: string | null }> = [];
@@ -53,6 +57,13 @@ export class BcTokenGenerator extends LitElement {
     initialize().then(() => (this._started = true));
   }
 
+  _onUpdatedAlg(e: { target: HTMLSelectElement }) {
+    const alg = e.target.selectedOptions[0]?.value;
+    if (alg) {
+      this._alg = alg;
+    }
+  }
+
   _onUpdatedBlock(blockId: number, e: { detail: { code: string } }) {
     const newBlocks = [...this._blocks];
     newBlocks[blockId] = {
@@ -72,8 +83,13 @@ export class BcTokenGenerator extends LitElement {
   }
 
   generateKey() {
-    const { private_key } = generate_keypair();
-    this.privateKey = private_key;
+    if (this._alg == "secp256r1") {
+      const { private_key } = generate_ecdsa_keypair();
+      this.privateKey = private_key;
+    } else {
+      const { private_key } = generate_keypair();
+      this.privateKey = private_key;
+    }
   }
 
   addBlock() {
@@ -100,6 +116,10 @@ export class BcTokenGenerator extends LitElement {
           <label for="public-key">Public key</label>
           <input id="public-key" value="${publicKey}" readonly disabled /><br />
           <button @click=${this.generateKey}>Generate key</button>
+          <select @change=${this._onUpdatedAlg}>
+            <option value="ed25519">ed25519</option>
+            <option value="secp256r1">secp256r1</option>
+          </select>
         </p>
       </div>
     `;
