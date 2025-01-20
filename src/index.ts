@@ -1,4 +1,3 @@
-import "./imp.js";
 import "./bc-token-editor.js";
 import "./bc-token-content.js";
 import "./bc-authorizer-editor.js";
