@@ -2,7 +2,7 @@ import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { Parser, Language, Query, QueryCapture, Tree } from "../tree-sitter.js";
+import { Parser } from "../tree-sitter.js";
 import { dispatchCustomEvent } from "./lib/events.js";
 
 const QUERY = `
@@ -34,6 +34,7 @@ const QUERY = `
   "trusting"
   "check if"
   "check all"
+  "reject if"
   "allow if"
   "deny if"
 ] @keyword
@@ -86,15 +87,15 @@ export class BcDatalogEditor extends LitElement {
   @property()
   readonly = false;
   @state()
-  _tree: Tree | null = null;
+  _tree: Parser.Tree | null = null;
   @state()
-  _captures: QueryCapture[] = [];
+  _captures: Parser.QueryCapture[] = [];
 
   @state()
   _parser: Parser | null = null;
 
   @state()
-  _query: Query | null = null;
+  _query: Parser.Query | null = null;
 
   constructor() {
     super();
@@ -109,15 +110,17 @@ export class BcDatalogEditor extends LitElement {
     super.connectedCallback();
     console.log("connected callback");
     console.log("Parser initialized");
-    console.log(Language);
-    Language.load("/assets/tree-sitter-biscuit.wasm").then((BiscuitDatalog) => {
-      console.log("Language initialized");
-      const p = new Parser();
-      p.setLanguage(BiscuitDatalog);
-      this._query = BiscuitDatalog.query(QUERY);
-      this._parser = p;
-      this.handleInput(this.code);
-    });
+    console.log(Parser.Language);
+    Parser.Language.load("/assets/tree-sitter-biscuit.wasm").then(
+      (BiscuitDatalog) => {
+        console.log("Language initialized");
+        const p = new Parser();
+        p.setLanguage(BiscuitDatalog);
+        this._query = BiscuitDatalog.query(QUERY);
+        this._parser = p;
+        this.handleInput(this.code);
+      }
+    );
   }
 
   firstUpdated(values: PropertyValues) {
